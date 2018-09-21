@@ -19,9 +19,13 @@ class LoginView {
 	 *
 	 * @return  void BUT writes to standard output and cookies!
 	 */
-	public function response(string $message) {		
-		$response = $this->generateLoginFormHTML($message);
-		//$response .= $this->generateLogoutButtonHTML($message);
+	public function response($isLoggedIn, $message) {
+    if (!$isLoggedIn) {		
+      $response = $this->generateLoginFormHTML($message);
+    } else {
+      $response = $this->generateLogoutButtonHTML($message);
+      $_SESSION["flash"] = "";
+    }
 		return $response;
 	}
 
