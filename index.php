@@ -1,5 +1,5 @@
 <?php
-
+session_start();
 //INCLUDE THE FILES NEEDED...
 require_once('view/LoginView.php');
 require_once('view/DateTimeView.php');
@@ -11,8 +11,8 @@ require_once('lib/Logic.php');
 //MAKE SURE ERRORS ARE SHOWN... MIGHT WANT TO TURN THIS OFF ON A PUBLIC SERVER
 error_reporting(E_ALL);
 ini_set('display_errors', 'Off');
-session_start();
-if ($_SESSION["flash"] == null) {
+
+if (!isset($_SESSION["flash"])) {
   Logic::Init_Session();
 }
 
@@ -39,18 +39,22 @@ if ($result->num_rows > 0) {
   echo "0 results.";
 }
 */
-$message = "";
+/*$message = "";
 
 if ($_SESSION["flash"] != null) {
   $message = $_SESSION["flash"];
-}
+}*/
 
 if ($loginControl->WantToLogin()) {
-  //$_SESSION["wantsToLogin"] = true;
   $loginControl->CheckLoginCredentials();
 } else if ($logoutControl->WantToLogout()) {
   $logoutControl->Logout();
+} else if (isset($_COOKIE["LoginView::CookieName"]) && isset($_COOKIE["LoginView::CookiePassword"]) && !$_SESSION["loggedIn"]) {
+  $loginControl->LoginWithCookies($_COOKIE["LoginView::CookieName"], $_COOKIE["LoginView::CookiePassword"]);
+  $layoutView->render($_SESSION["loggedIn"], $loginView, $dateTimeView, $_SESSION["flash"]);
+  $_SESSION["flash"] = "";
 } else {
-  $layoutView->render($_SESSION["loggedIn"], $loginView, $dateTimeView, $message);
+  $layoutView->render($_SESSION["loggedIn"], $loginView, $dateTimeView, $_SESSION["flash"]);
+  $_SESSION["flash"] = "";
 }
 //$con->close();

@@ -1,4 +1,5 @@
 <?php
+require_once('RegisterView.php');
 
 class LoginView {
 	private static $login = 'LoginView::Login';
@@ -20,7 +21,10 @@ class LoginView {
 	 * @return  void BUT writes to standard output and cookies!
 	 */
 	public function response($isLoggedIn, $message) {
-    if (!$isLoggedIn) {		
+    $registerView = new RegisterView();
+    if (isset($_GET["Register"])) {
+      echo "HIIIIIIIIIII";
+    } else if (!$isLoggedIn) {		
       $response = $this->generateLoginFormHTML($message);
     } else {
       $response = $this->generateLogoutButtonHTML($message);

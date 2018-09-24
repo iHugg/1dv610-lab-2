@@ -5,8 +5,15 @@
     }
 
     public function Logout () {
-      $_SESSION["loggedIn"] = false;
-      $_SESSION["flash"] = "Bye bye!";
+      if ($_SESSION["loggedIn"]) {
+        $_SESSION["flash"] = "Bye bye!";
+        $_SESSION["loggedIn"] = false;
+      } else {
+        $_SESSION["flash"] = "";
+      }
+
+      setcookie("LoginView::CookieName", "", time() - 3600);
+      setcookie("LoginView::CookiePassword", "", time() - 3600);
 
       $location = "";
 
