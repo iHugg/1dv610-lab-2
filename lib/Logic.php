@@ -5,5 +5,10 @@
       $_SESSION["loggedIn"] = false;
       $_SESSION["enteredUsername"] = "";
     }
+
+    public static function RetrieveUsers ($con) {
+      $sql = "SELECT username, password FROM users";
+      return $con->query($sql);
+    }
   }
 ?>

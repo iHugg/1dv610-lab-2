@@ -7,9 +7,12 @@
       return isset($_POST["LoginView::Login"]);
     }
 
-    public function CheckLoginCredentials () {
+    public function CheckLoginCredentials ($con) {
       $enteredUsername = $_POST["LoginView::UserName"];
       $enteredPassword = $_POST["LoginView::Password"];
+      $userFound = false;
+      $users = Logic::RetrieveUsers($con);
+
       if ($enteredUsername == "") {
         $_SESSION["flash"] = "Username is missing";
         $_SESSION["enteredUsername"] = "";
@@ -17,24 +20,27 @@
         $_SESSION["enteredUsername"] = $enteredUsername;
         $_SESSION["flash"] = "Password is missing";
       } else {
-        if (($enteredUsername == $this->username && $enteredPassword != $this->password) ||
-        ($enteredUsername != $this->username && $enteredPassword == $this->password) ||
-        ($enteredUsername != $this->username && $enteredPassword != $this->password)) {
+        if ($users->num_rows > 0) {
+          while ($user = $users->fetch_assoc()) {
+            if ($enteredUsername == $user["username"] && password_verify($enteredPassword, $user["password"])) {
+              $userFound = true;
+              if (!$_SESSION["loggedIn"]) {
+                if (isset($_POST["LoginView::KeepMeLoggedIn"])) {
+                  setcookie("LoginView::CookieName", $enteredUsername, time() + (24 * (60 + 60)));
+                  setcookie("LoginView::CookiePassword", password_hash($enteredPassword, PASSWORD_BCRYPT), time() + (24 * (60 + 60)));
+                  $_SESSION["flash"] = "Welcome and you will be remembered";
+                } else {
+                  $_SESSION["flash"] = "Welcome";
+                }
+                $_SESSION["loggedIn"] = true;
+                break;
+              }
+            }
+          }
+        }
+        if (!$userFound) {
           $_SESSION["flash"] = "Wrong name or password";
           $_SESSION["enteredUsername"] = $enteredUsername;
-        } else if ($enteredUsername == $this->username && $enteredPassword == $this->password) {
-          if (!$_SESSION["loggedIn"]) {
-            if (isset($_POST["LoginView::KeepMeLoggedIn"])) {
-              setcookie("LoginView::CookieName", $enteredUsername, time() + (2 * (60 + 60)));
-              setcookie("LoginView::CookiePassword", password_hash($enteredPassword, PASSWORD_BCRYPT), time() + (24 * (60 + 60)));
-              $_SESSION["flash"] = "Welcome and you will be remembered";
-            } else {
-              $_SESSION["flash"] = "Welcome";
-            }
-            $_SESSION["loggedIn"] = true;
-          } else {
-             $_SESSION["flash"] = "";
-          }
         }
       }
 

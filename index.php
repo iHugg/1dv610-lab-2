@@ -24,41 +24,34 @@ $layoutView = new LayoutView();
 $loginControl = new LoginController();
 $logoutControl = new LogoutController();
 $registerController = new RegisterController();
-// $con = mysqli_connect("localhost", "root", "", "1dv610_lab_2_db");
+$con = new mysqli("den1.mysql3.gear.host", "lab2db1dv610", "Xo24?fI0Ppy_", "lab2db1dv610");
+$browserFound = true;
 
-/*if ($con->connect_error) {
+if (!isset($_SESSION["browser"])) {
+  $_SESSION["browser"] = $_SERVER["HTTP_USER_AGENT"];
+} else if ($_SESSION["browser"] != $_SERVER["HTTP_USER_AGENT"]) {
+  $browserFound = false;
+  $layoutView->render(false, $loginView, $dateTimeView, "", false);
+}
+
+if ($con->connect_error) {
   die("Connection failed: " . $con->connect_error);
 }
 
-$sql = "SELECT id, username, password FROM users";
-$result = $con->query($sql);
-
-if ($result->num_rows > 0) {
-  while ($row = $result->fetch_assoc()) {
-    echo "id: " . $row["id"] . " - Username: " . $row["username"] . " - Password: " . $row["password"];
+if ($browserFound) {
+  if ($loginControl->WantToLogin()) {
+    $loginControl->CheckLoginCredentials($con);
+  } else if ($logoutControl->WantToLogout()) {
+    $logoutControl->Logout();
+  } else if (isset($_COOKIE["LoginView::CookieName"]) && isset($_COOKIE["LoginView::CookiePassword"]) && !$_SESSION["loggedIn"]) {
+    $loginControl->LoginWithCookies($_COOKIE["LoginView::CookieName"], $_COOKIE["LoginView::CookiePassword"]);
+    $layoutView->render($_SESSION["loggedIn"], $loginView, $dateTimeView, $_SESSION["flash"], isset($_GET["register"]));
+    $_SESSION["flash"] = "";
+  } else if (isset($_POST["RegisterView::Register"])) {
+    $registerController->CheckRegisterCredentials($con);
+  } else {
+    $layoutView->render($_SESSION["loggedIn"], $loginView, $dateTimeView, $_SESSION["flash"], isset($_GET["register"]));
+    $_SESSION["flash"] = "";
   }
-} else {
-  echo "0 results.";
 }
-*/
-/*$message = "";
-
-if ($_SESSION["flash"] != null) {
-  $message = $_SESSION["flash"];
-}*/
-
-if ($loginControl->WantToLogin()) {
-  $loginControl->CheckLoginCredentials();
-} else if ($logoutControl->WantToLogout()) {
-  $logoutControl->Logout();
-} else if (isset($_COOKIE["LoginView::CookieName"]) && isset($_COOKIE["LoginView::CookiePassword"]) && !$_SESSION["loggedIn"]) {
-  $loginControl->LoginWithCookies($_COOKIE["LoginView::CookieName"], $_COOKIE["LoginView::CookiePassword"]);
-  $layoutView->render($_SESSION["loggedIn"], $loginView, $dateTimeView, $_SESSION["flash"], isset($_GET["register"]));
-  $_SESSION["flash"] = "";
-} else if (isset($_POST["RegisterView::Register"])) {
-  $registerController->CheckRegisterCredentials();
-} else {
-  $layoutView->render($_SESSION["loggedIn"], $loginView, $dateTimeView, $_SESSION["flash"], isset($_GET["register"]));
-  $_SESSION["flash"] = "";
-}
-//$con->close();
+$con->close();
