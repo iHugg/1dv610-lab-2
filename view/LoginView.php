@@ -20,10 +20,10 @@ class LoginView {
 	 *
 	 * @return  void BUT writes to standard output and cookies!
 	 */
-	public function response($isLoggedIn, $message) {
+	public function response($isLoggedIn, $message, $goToRegister) {
     $registerView = new RegisterView();
-    if (isset($_GET["Register"])) {
-      echo "HIIIIIIIIIII";
+    if ($goToRegister) {
+      $response = $registerView->generateRegisterFormHTML($message);
     } else if (!$isLoggedIn) {		
       $response = $this->generateLoginFormHTML($message);
     } else {

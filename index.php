@@ -6,6 +6,7 @@ require_once('view/DateTimeView.php');
 require_once('view/LayoutView.php');
 require_once('controller/LoginController.php');
 require_once('controller/LogoutController.php');
+require_once('controller/RegisterController.php');
 require_once('lib/Logic.php');
 
 //MAKE SURE ERRORS ARE SHOWN... MIGHT WANT TO TURN THIS OFF ON A PUBLIC SERVER
@@ -22,6 +23,7 @@ $dateTimeView = new DateTimeView();
 $layoutView = new LayoutView();
 $loginControl = new LoginController();
 $logoutControl = new LogoutController();
+$registerController = new RegisterController();
 // $con = mysqli_connect("localhost", "root", "", "1dv610_lab_2_db");
 
 /*if ($con->connect_error) {
@@ -51,10 +53,12 @@ if ($loginControl->WantToLogin()) {
   $logoutControl->Logout();
 } else if (isset($_COOKIE["LoginView::CookieName"]) && isset($_COOKIE["LoginView::CookiePassword"]) && !$_SESSION["loggedIn"]) {
   $loginControl->LoginWithCookies($_COOKIE["LoginView::CookieName"], $_COOKIE["LoginView::CookiePassword"]);
-  $layoutView->render($_SESSION["loggedIn"], $loginView, $dateTimeView, $_SESSION["flash"]);
+  $layoutView->render($_SESSION["loggedIn"], $loginView, $dateTimeView, $_SESSION["flash"], isset($_GET["register"]));
   $_SESSION["flash"] = "";
+} else if (isset($_POST["RegisterView::Register"])) {
+  $registerController->CheckRegisterCredentials();
 } else {
-  $layoutView->render($_SESSION["loggedIn"], $loginView, $dateTimeView, $_SESSION["flash"]);
+  $layoutView->render($_SESSION["loggedIn"], $loginView, $dateTimeView, $_SESSION["flash"], isset($_GET["register"]));
   $_SESSION["flash"] = "";
 }
 //$con->close();

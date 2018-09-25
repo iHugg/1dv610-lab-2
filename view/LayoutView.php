@@ -3,7 +3,20 @@
 
 class LayoutView {
   
-  public function render($isLoggedIn, LoginView $v, DateTimeView $dtv, string $message) {
+  public function render($isLoggedIn, $v, $dtv, $message, $goToRegister) {
+    $location = "";
+    $query = "";
+    $aTagMessage = "Back to login";
+
+    if ($_SERVER["HTTP_HOST"] == "localhost") {
+      $location = "/1dv610-lab-2";
+    }
+
+    if (!$goToRegister) {
+      $query = "?register";
+      $aTagMessage = "Register a new user";
+    }
+
     echo '<!DOCTYPE html>
       <html>
         <head>
@@ -12,11 +25,11 @@ class LayoutView {
         </head>
         <body>
           <h1>Assignment 2</h1>
-          <a href="" id="Register">Register new user</a>
+          <a href="' . $location . '/index.php' . $query . '" id="register">' . $aTagMessage . '</a>
           ' . $this->renderIsLoggedIn($isLoggedIn) . '
           
           <div class="container">
-              ' . $v->response($isLoggedIn, $message) . '
+              ' . $v->response($isLoggedIn, $message, $goToRegister) . '
               
               ' . $dtv->show() . '
           </div>

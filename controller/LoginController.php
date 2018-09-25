@@ -37,12 +37,8 @@
           }
         }
       }
-      $location = "";
 
-      if ($_SERVER["HTTP_HOST"] == "localhost") {
-        $location = "/1dv610-lab-2";
-      }
-      header("Location: http://" . $_SERVER["HTTP_HOST"] . $location);
+      header("Location: http://" . $_SERVER["HTTP_HOST"] . $_SERVER["PHP_SELF"]);
     }
 
     public function LoginWithCookies ($username, $password) {
