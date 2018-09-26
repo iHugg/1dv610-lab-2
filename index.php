@@ -27,6 +27,7 @@ $registerController = new RegisterController();
 $con = new mysqli("den1.mysql3.gear.host", "lab2db1dv610", "Xo24?fI0Ppy_", "lab2db1dv610");
 $errorFound = false;
 
+//Checks if session has been stolen
 if (!isset($_SESSION["browser"])) {
   $_SESSION["browser"] = $_SERVER["HTTP_USER_AGENT"];
 } else if ($_SESSION["browser"] != $_SERVER["HTTP_USER_AGENT"]) {
@@ -38,11 +39,13 @@ if ($con->connect_error) {
   die("Connection failed: " . $con->connect_error);
 }
 
-if (!Logic::CheckCookie($con) && isset($_COOKIE["LoginView::CookiePassword"])) {
+//Checks if password cookie has been tampered with
+if (!Logic::CheckCookieTampering($con) && isset($_COOKIE["LoginView::CookiePassword"])) {
   $errorFound = true;
   $layoutView->render(false, $loginView, $dateTimeView, "Wrong information in cookies", false);
 }
 
+//If no errors were found, print the page depending on the action taken
 if (!$errorFound) {
   if ($loginControl->WantToLogin()) {
     $loginControl->CheckLoginCredentials($con);

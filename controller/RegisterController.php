@@ -48,6 +48,7 @@
         }
       }
 
+      //remove the tags and also any other non alphanumerical character
       if ($invalidCharFound) {
         $failedRegister = true;
         $enteredUsername = strip_tags($enteredUsername);

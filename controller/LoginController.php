@@ -7,6 +7,7 @@
       return isset($_POST["LoginView::Login"]);
     }
 
+    //Could split this method into multiple methods since this looks pretty cluttered
     public function CheckLoginCredentials ($con) {
       $enteredUsername = $_POST["LoginView::UserName"];
       $enteredPassword = $_POST["LoginView::Password"];

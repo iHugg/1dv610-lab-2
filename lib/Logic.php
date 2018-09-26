@@ -1,4 +1,5 @@
 <?php
+//Used for simple tasks that doesn't require instantiating an object
   class Logic {
     public static function Init_Session () {
       $_SESSION["flash"] = "";
@@ -11,7 +12,7 @@
       return $con->query($sql);
     }
 
-    public static function CheckCookie ($con) {
+    public static function CheckCookieTampering ($con) {
       $browsers = $con->query("SELECT browserName, passwordCookie FROM browsers");
 
       if ($browsers->num_rows > 0) {
