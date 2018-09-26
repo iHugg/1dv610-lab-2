@@ -25,12 +25,12 @@ $loginControl = new LoginController();
 $logoutControl = new LogoutController();
 $registerController = new RegisterController();
 $con = new mysqli("den1.mysql3.gear.host", "lab2db1dv610", "Xo24?fI0Ppy_", "lab2db1dv610");
-$browserFound = true;
+$errorFound = false;
 
 if (!isset($_SESSION["browser"])) {
   $_SESSION["browser"] = $_SERVER["HTTP_USER_AGENT"];
 } else if ($_SESSION["browser"] != $_SERVER["HTTP_USER_AGENT"]) {
-  $browserFound = false;
+  $errorFound = true;
   $layoutView->render(false, $loginView, $dateTimeView, "", false);
 }
 
@@ -38,7 +38,12 @@ if ($con->connect_error) {
   die("Connection failed: " . $con->connect_error);
 }
 
-if ($browserFound) {
+if (!Logic::CheckCookie($con) && isset($_COOKIE["LoginView::CookiePassword"])) {
+  $errorFound = true;
+  $layoutView->render(false, $loginView, $dateTimeView, "Wrong information in cookies", false);
+}
+
+if (!$errorFound) {
   if ($loginControl->WantToLogin()) {
     $loginControl->CheckLoginCredentials($con);
   } else if ($logoutControl->WantToLogout()) {
