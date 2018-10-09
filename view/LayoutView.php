@@ -1,22 +1,9 @@
 <?php
-
+namespace view;
 
 class LayoutView {
   
-  public function render($isLoggedIn, $v, $dtv, $message, $goToRegister) {
-    $location = "";
-    $query = "";
-    $aTagMessage = "Back to login";
-
-    if ($_SERVER["HTTP_HOST"] == "localhost") {
-      $location = "/1dv610-lab-2";
-    }
-
-    if (!$goToRegister) {
-      $query = "?register";
-      $aTagMessage = "Register a new user";
-    }
-
+  public function render(bool $isLoggedIn, LoginView $loginView, DateTimeView $dateTimeView) {
     echo '<!DOCTYPE html>
       <html>
         <head>
@@ -25,25 +12,28 @@ class LayoutView {
         </head>
         <body>
           <h1>Assignment 2</h1>
-          <a href="' . $location . '/index.php' . $query . '" id="register">' . $aTagMessage . '</a>
           ' . $this->renderIsLoggedIn($isLoggedIn) . '
           
           <div class="container">
-              ' . $v->response($isLoggedIn, $message, $goToRegister) . '
+              ' . $loginView->response() . '
               
-              ' . $dtv->show() . '
+              ' . $dateTimeView->show() . '
           </div>
          </body>
       </html>
     ';
   }
-
-  private function renderIsLoggedIn($isLoggedIn) {
+  
+  private function renderIsLoggedIn(bool $isLoggedIn) : string {
     if ($isLoggedIn) {
       return '<h2>Logged in</h2>';
     }
     else {
       return '<h2>Not logged in</h2>';
     }
+  }
+
+  public function redirectToLoginPage() {
+    header("Location: http://" . $_SERVER["HTTP_HOST"] . $_SERVER["PHP_SELF"]);
   }
 }

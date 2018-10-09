@@ -1,5 +1,5 @@
 <?php
-require_once('RegisterView.php');
+namespace view;
 
 class LoginView {
 	private static $login = 'LoginView::Login';
@@ -11,8 +11,6 @@ class LoginView {
 	private static $keep = 'LoginView::KeepMeLoggedIn';
 	private static $messageId = 'LoginView::Message';
 
-	
-
 	/**
 	 * Create HTTP response
 	 *
@@ -20,16 +18,10 @@ class LoginView {
 	 *
 	 * @return  void BUT writes to standard output and cookies!
 	 */
-	public function response($isLoggedIn, $message, $goToRegister) {
-    $registerView = new RegisterView();
-    if ($goToRegister) {
-      $response = $registerView->generateRegisterFormHTML($message);
-    } else if (!$isLoggedIn) {		
-      $response = $this->generateLoginFormHTML($message);
-    } else {
-      $response = $this->generateLogoutButtonHTML($message);
-      $_SESSION["flash"] = "";
-    }
+	public function response() : string {
+    $session = new \model\Session();
+		$response = $this->generateLoginFormHTML($session->getMessage());
+    //$response .= $this->generateLogoutButtonHTML($message);
 		return $response;
 	}
 
@@ -38,7 +30,7 @@ class LoginView {
 	* @param $message, String output message
 	* @return  void, BUT writes to standard output!
 	*/
-	private function generateLogoutButtonHTML($message) {
+	private function generateLogoutButtonHTML(string $message) : string {
 		return '
 			<form  method="post" >
 				<p id="' . self::$messageId . '">' . $message .'</p>
@@ -52,12 +44,7 @@ class LoginView {
 	* @param $message, String output message
 	* @return  void, BUT writes to standard output!
 	*/
-	private function generateLoginFormHTML($message) {
-    $enteredUsername = "";
-
-    if ($_SESSION["enteredUsername"] != null) {
-      $enteredUsername = $_SESSION["enteredUsername"];
-    }
+	private function generateLoginFormHTML(string $message) : string {
 		return '
 			<form method="post" > 
 				<fieldset>
@@ -65,10 +52,10 @@ class LoginView {
 					<p id="' . self::$messageId . '">' . $message . '</p>
 					
 					<label for="' . self::$name . '">Username :</label>
-					<input type="text" id="' . self::$name . '" name="' . self::$name . '" value="'. $enteredUsername . '"/>
+					<input type="text" id="' . self::$name . '" name="' . self::$name . '" value="" />
 
 					<label for="' . self::$password . '">Password :</label>
-					<input type="password" id="' . self::$password . '" name="' . self::$password . '"/>
+					<input type="password" id="' . self::$password . '" name="' . self::$password . '" />
 
 					<label for="' . self::$keep . '">Keep me logged in  :</label>
 					<input type="checkbox" id="' . self::$keep . '" name="' . self::$keep . '" />
@@ -83,5 +70,16 @@ class LoginView {
 	private function getRequestUserName() {
 		//RETURN REQUEST VARIABLE: USERNAME
 	}
-	
+  
+  public function wantsToLogin() {
+    return isset($_POST[self::$login]);
+  }
+
+  public function isUsernameEmpty() {
+    return $_POST[self::$name] == "";
+  }
+
+  public function isPasswordEmpty() {
+    return $_POST[self::$password] == "";
+  }
 }
