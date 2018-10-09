@@ -71,15 +71,23 @@ class LoginView {
 		//RETURN REQUEST VARIABLE: USERNAME
 	}
   
-  public function wantsToLogin() {
+  public function wantsToLogin() : bool {
     return isset($_POST[self::$login]);
   }
 
-  public function isUsernameEmpty() {
+  public function getEnteredUsername() : string {
+    return $_POST[self::$name];
+  }
+
+  public function isUsernameEmpty() : bool {
     return $_POST[self::$name] == "";
   }
 
-  public function isPasswordEmpty() {
+  public function getEnteredPassword() : string {
+    return $_POST[self::$password];
+  }
+
+  public function isPasswordEmpty() : bool {
     return $_POST[self::$password] == "";
   }
 }

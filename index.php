@@ -6,6 +6,8 @@ require_once('view/DateTimeView.php');
 require_once('view/LayoutView.php');
 require_once('controller/LoginController.php');
 require_once('model/Session.php');
+require_once('model/Database.php');
+require_once('model/User.php');
 
 //MAKE SURE ERRORS ARE SHOWN... MIGHT WANT TO TURN THIS OFF ON A PUBLIC SERVER
 error_reporting(E_ALL);
@@ -19,8 +21,12 @@ $loginController = new \controller\LoginController($loginView, $layoutView, $dat
 $session = new \model\Session();
 
 if ($loginView->wantsToLogin()) {
-  $loginController->checkEmptyLoginFields();
-  $loginControler->checkLoginCredentials();
+  $username = $loginView->getEnteredUsername();
+  $password = $loginView->getEnteredPassword();
+  $user = new \model\User($username, $password);
+
+  $loginController->checkEmptyLoginFields($user);
+  $loginController->checkLoginCredentials($user);
 
   $layoutView->redirectToLoginPage();
 }
