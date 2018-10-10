@@ -9,7 +9,12 @@ class LoginView {
 	private static $cookieName = 'LoginView::CookieName';
 	private static $cookiePassword = 'LoginView::CookiePassword';
 	private static $keep = 'LoginView::KeepMeLoggedIn';
-	private static $messageId = 'LoginView::Message';
+  private static $messageId = 'LoginView::Message';
+  private $session;
+
+  public function __construct() {
+    $this->session = new \model\Session();
+  }
 
 	/**
 	 * Create HTTP response
@@ -19,9 +24,14 @@ class LoginView {
 	 * @return  void BUT writes to standard output and cookies!
 	 */
 	public function response() : string {
-    $session = new \model\Session();
-		$response = $this->generateLoginFormHTML($session->getMessage());
-    //$response .= $this->generateLogoutButtonHTML($message);
+    $response = "";
+    $message = $this->session->getMessage();
+
+    if (!$this->session->getLoggedIn()) {
+      $response = $this->generateLoginFormHTML($message);
+    } else {
+      $response .= $this->generateLogoutButtonHTML($message);
+    }
 		return $response;
 	}
 
@@ -52,7 +62,7 @@ class LoginView {
 					<p id="' . self::$messageId . '">' . $message . '</p>
 					
 					<label for="' . self::$name . '">Username :</label>
-					<input type="text" id="' . self::$name . '" name="' . self::$name . '" value="" />
+					<input type="text" id="' . self::$name . '" name="' . self::$name . '" value="' . $this->session->getEnteredUsername() . '" />
 
 					<label for="' . self::$password . '">Password :</label>
 					<input type="password" id="' . self::$password . '" name="' . self::$password . '" />
@@ -89,5 +99,9 @@ class LoginView {
 
   public function isPasswordEmpty() : bool {
     return $_POST[self::$password] == "";
+  }
+
+  public function wantsToLogout() : bool {
+    return isset($_POST[self::$logout]);
   }
 }

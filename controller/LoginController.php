@@ -4,35 +4,55 @@
   class LoginController {
     private $loginView;
     private $layoutView;
-    private $dateTimeView;
     private $session;
     private $database;
 
-    public function __construct(\view\LoginView $loginView, \view\LayoutView $layoutView, \view\DateTimeView $dateTimeView) {
+    public function __construct(\view\LoginView $loginView, \view\LayoutView $layoutView) {
       $this->loginView = $loginView;
       $this->layoutView = $layoutView;
-      $this->dateTimeView = $dateTimeView;
       $this->session = new \model\Session();
       $this->database = new \model\Database();
     }
 
-    public function checkEmptyLoginFields(\model\User $user) {
+    public function handleLogin() {
+      $user = $this->getUserCredentials();
+
+      if (!$this->areCredentialsEmpty($user)) {
+        $this->checkLoginCredentials($user);
+      }
+      $this->layoutView->redirectToLoginPage();
+    }
+
+    private function areCredentialsEmpty(\model\User $user) : bool {
       if ($user->isUsernameEmpty()) {
         $this->session->setMessage("Username is missing");
+        return true;
       } else if ($user->isPasswordEmpty()) {
         $this->session->setMessage("Password is missing");
+        $this->session->setEnteredUsername($user->getUsername());
+        return true;
+      }
+
+      return false;
+    }
+
+    private function checkLoginCredentials(\model\User $user) {
+      $hashedPassword = $this->database->getHashedPassword($user->getUsername());
+
+      if ($user->passwordsMatch($hashedPassword)) {
+        $loggedIn = true;
+        $this->session->setMessage("Welcome");
+        $this->session->setLoggedIn($loggedIn);
+      } else {
+        $this->session->setMessage("Wrong name or password");
+        $this->session->setEnteredUsername($user->getUsername());
       }
     }
 
-    public function checkLoginCredentials(\model\User $user) {
-      if ($this->database->userExists($user->getUsername())) {
-        $this->session->setMessage("User exists!");
-      } else {
-        $this->session->setMessage("User doesn't exist :(");
-      }
-      /*if ($this->database->doesUserExist($user->getUsername())) {
-
-      }*/
+    private function getUserCredentials() : \model\User {
+      $username = $this->loginView->getEnteredUsername();
+      $password = $this->loginView->getEnteredPassword();
+      return new \model\User($username, $password);
     }
   }
 ?>

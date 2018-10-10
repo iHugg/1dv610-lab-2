@@ -15,13 +15,17 @@ class Database {
   }
 
   public function userExists(string $username) : bool {
-    $result = $this->connection->query('SELECT username from users WHERE username = "' . $username . '"');
+    return $this->connection->query('SELECT username from users WHERE username = "' . $username . '"')->num_rows > 0;
+  }
 
-    if ($result->num_rows > 0) {
-      return true;
+  public function getHashedPassword(string $username) : string {
+    $result = $this->connection->query('SELECT password from users WHERE username = "' . $username . '"');
+    
+    if ($result->num_rows == 1) {
+      return $result->fetch_assoc()["password"];
     }
 
-    return false;
+    return "";
   }
 }
 ?>
