@@ -14,6 +14,16 @@
       $this->database = new \model\Database();
     }
 
+    public function handleLoginByCookies() {
+      $cookieUser = $this->loginView->getCookieUser();
+      $hashedPassword = $this->database->getHashedPassword($cookieUser->getUsername());
+      if ($hashedPassword == $cookieUser->getPassword()) {
+        $loggedIn = true;
+        $this->session->setMessage("Welcome back with cookies");
+        $this->session->setLoggedIn($loggedIn);
+      }
+    }
+
     public function handleLogin() {
       $user = $this->getUserCredentials();
 
@@ -43,6 +53,7 @@
         $loggedIn = true;
         $this->session->setMessage("Welcome");
         $this->session->setLoggedIn($loggedIn);
+        $this->handleStayLoggedIn($user);
       } else {
         $this->session->setMessage("Wrong name or password");
         $this->session->setEnteredUsername($user->getUsername());
@@ -53,6 +64,15 @@
       $username = $this->loginView->getEnteredUsername();
       $password = $this->loginView->getEnteredPassword();
       return new \model\User($username, $password);
+    }
+
+    private function handleStayLoggedIn(\model\User $user) {
+      if ($this->loginView->wantsToStayLoggedIn()) {
+        $username = $user->getUsername();
+        $hashedPassword = $this->database->getHashedPassword($username);
+        $this->loginView->setLoginCookies($username, $hashedPassword);
+        $this->session->setMessage("Welcome and you will be remembered");
+      }
     }
   }
 ?>

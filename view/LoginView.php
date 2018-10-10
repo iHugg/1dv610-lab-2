@@ -27,7 +27,7 @@ class LoginView {
     $response = "";
     $message = $this->session->getMessage();
 
-    if (!$this->session->getLoggedIn()) {
+    if (!$this->session->isLoggedIn()) {
       $response = $this->generateLoginFormHTML($message);
     } else {
       $response .= $this->generateLogoutButtonHTML($message);
@@ -85,6 +85,10 @@ class LoginView {
     return isset($_POST[self::$login]);
   }
 
+  public function wantsToStayLoggedIn() : bool {
+    return isset($_POST[self::$keep]);
+  }
+
   public function getEnteredUsername() : string {
     return $_POST[self::$name];
   }
@@ -103,5 +107,28 @@ class LoginView {
 
   public function wantsToLogout() : bool {
     return isset($_POST[self::$logout]);
+  }
+
+  public function setLoginCookies(string $username, string $hashedPassword) {
+    setcookie(self::$cookieName, $username, time() + (24 * (60 + 60)));
+    setcookie(self::$cookiePassword, $hashedPassword, time() + (24 * (60 + 60)));
+  }
+
+  public function loginCookiesExist() : bool {
+    return (isset($_COOKIE[self::$cookieName]) && isset($_COOKIE[self::$cookiePassword]));
+  }
+
+  public function getCookieUser() : \model\User {
+    return new \model\User($_COOKIE[self::$cookieName], $_COOKIE[self::$cookiePassword]);
+  }
+
+  public function removeLoginCookies() {
+    if (isset($_COOKIE[self::$cookieName])) {
+      setcookie(self::$cookieName, "", time() - 3600);
+    }
+
+    if (isset($_COOKIE[self::$cookiePassword])) {
+      setcookie(self::$cookiePassword, "", time() - 3600);
+    }
   }
 }

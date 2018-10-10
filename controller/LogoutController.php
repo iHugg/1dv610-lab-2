@@ -16,6 +16,7 @@ class LogoutController {
     $loggedIn = false;
     $this->session->setLoggedIn($loggedIn);
     $this->session->setMessage("Bye bye!");
+    $this->loginView->removeLoginCookies();
     $this->layoutView->redirectToLoginPage();
   }
 }

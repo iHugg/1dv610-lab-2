@@ -30,7 +30,7 @@ class Session {
     return $_SESSION[self::$message] == "";
   }
 
-  public function getLoggedIn() : bool {
+  public function isLoggedIn() : bool {
     return $_SESSION[self::$loggedIn];
   }
 

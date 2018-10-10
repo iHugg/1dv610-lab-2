@@ -26,8 +26,10 @@ if ($loginView->wantsToLogin()) {
   $loginController->handleLogin();
 } else if ($loginView->wantsToLogout()) {
   $logoutController->handleLogout();
+} else if ($loginView->loginCookiesExist() && !$session->isLoggedIn()) {
+  $loginController->handleLoginByCookies();
 }
-$layoutView->render($session->getLoggedIn(), $loginView, $dateTimeView);
+$layoutView->render($session->isLoggedIn(), $loginView, $dateTimeView);
 
 if (!$loginView->wantsToLogin() && !$loginView->wantsToLogout()) {
   $session->setMessage("");
