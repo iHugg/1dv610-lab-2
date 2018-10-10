@@ -111,7 +111,7 @@ class LoginView {
 
   public function setLoginCookies(string $username, string $hashedPassword) {
     setcookie(self::$cookieName, $username, time() + (24 * (60 + 60)));
-    setcookie(self::$cookiePassword, $hashedPassword, time() + (24 * (60 + 60)));
+    setcookie(self::$cookiePassword, password_hash($hashedPassword, PASSWORD_BCRYPT), time() + (24 * (60 + 60)));
   }
 
   public function loginCookiesExist() : bool {

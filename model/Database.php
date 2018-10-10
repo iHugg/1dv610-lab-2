@@ -10,7 +10,7 @@ class Database {
     $this->connection = new \mysqli($this->settings["dbURL"], $this->settings["dbName"], $this->settings["dbPassword"], $this->settings["dbName"]);
   }
 
-  private function __destruct() {
+  public function __destruct() {
     $this->connection->close();
   }
 

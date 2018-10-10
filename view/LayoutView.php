@@ -2,8 +2,19 @@
 namespace view;
 
 class LayoutView {
+  private $loginView;
+  private $dateTimeView;
+  private $registerView;
+  private $query;
+
+  public function __construct(LoginView $loginView, RegisterView $registerView) {
+    $this->loginView = $loginView;
+    $this->dateTimeView = new DateTimeView();
+    $this->registerView = $registerView;
+    $this->query = "?register";
+  }
   
-  public function render(bool $isLoggedIn, LoginView $loginView, DateTimeView $dateTimeView) {
+  public function render(bool $isLoggedIn) {
     echo '<!DOCTYPE html>
       <html>
         <head>
@@ -12,12 +23,12 @@ class LayoutView {
         </head>
         <body>
           <h1>Assignment 2</h1>
+          ' . $this->renderRegisterLink() . '
           ' . $this->renderIsLoggedIn($isLoggedIn) . '
           
           <div class="container">
-              ' . $loginView->response() . '
-              
-              ' . $dateTimeView->show() . '
+              ' . $this->getContent() . '
+              ' . $this->dateTimeView->show() . '
           </div>
          </body>
       </html>
@@ -33,7 +44,36 @@ class LayoutView {
     }
   }
 
+  private function getContent() : string {
+    if ($_SERVER["QUERY_STRING"] == "register") {
+      return $this->registerView->generateRegisterFormHTML();
+     } else {
+      return $this->loginView->response();
+     }
+  }
+
+  private function renderRegisterLink() {
+    $location = "";
+    $query = "";
+    $aTagMessage = "Back to login";
+
+    if (strlen($_SERVER["QUERY_STRING"]) == 0) {
+      $query = $this->query;
+      $aTagMessage = "Register a new user";
+    }
+
+    if ($_SERVER["HTTP_HOST"] == "localhost") {
+      $location = "/1dv610-lab-2";
+    }
+
+    return '<a href="' . $location . '/index.php' . $query . '" id="register">' . $aTagMessage . '</a>';
+  }
+
   public function redirectToLoginPage() {
     header("Location: http://" . $_SERVER["HTTP_HOST"] . $_SERVER["PHP_SELF"]);
+  }
+
+  public function redirectToRegisterPage() {
+    header("Location: http://" . $_SERVER["HTTP_HOST"] . $_SERVER["PHP_SELF"] . $this->query);
   }
 }

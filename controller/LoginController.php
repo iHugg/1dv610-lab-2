@@ -17,9 +17,9 @@
     public function handleLoginByCookies() {
       $cookieUser = $this->loginView->getCookieUser();
       $hashedPassword = $this->database->getHashedPassword($cookieUser->getUsername());
-      if ($hashedPassword == $cookieUser->getPassword()) {
+      if (password_verify($hashedPassword, $cookieUser->getPassword())) {
         $loggedIn = true;
-        $this->session->setMessage("Welcome back with cookies");
+        $this->session->setMessage("Welcome back with cookie");
         $this->session->setLoggedIn($loggedIn);
       }
     }
