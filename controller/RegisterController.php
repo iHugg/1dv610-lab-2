@@ -19,28 +19,53 @@ class RegisterController {
   }
 
   public function handleRegister() {
-    if (!$this->checkCredentials()) {
-
+    if (!$this->checkIfCredentialsAreWrong()) {
+      $this->registerUser();
+      $this->layoutView->redirectToLoginPage();
+    } else {
+      $this->layoutView->redirectToRegisterPage();
     }
-
-    $this->layoutView->redirectToRegisterPage();
   }
 
-  private function checkCredentials() : bool {
+  private function registerUser() {
+    $username = $this->registerView->getUsername();
+    $password = $this->registerView->getPassword();
+
+    if ($this->database->addUserToDatabase($username, $password)) {
+      $this->session->setMessage("Registered new user.");
+    } else {
+      $this->session->setMessage("Something went wrong when registering the user.");
+    }
+  }
+
+  private function checkIfCredentialsAreWrong() : bool {
     $username = $this->registerView->getUsername();
     $password = $this->registerView->getPassword();
     $repeatPassword = $this->registerView->getRepeatPassword();
     $this->session->setEnteredUsername($username);
+    $errorFound = false;
 
-    if ($this->isUsernameLengthOkay($username) &&
-    $this->isPasswordLengthOkay($password) &&
-    $this->checkIfPasswordsMatch($password, $repeatPassword) &&
-    !$this->checkIfUsernameExists($username) &&
-    !$this->checkUsernameInvalidCharacters($username)) {
-      return true;
+    if (!$this->isUsernameLengthOkay($username)) {
+      $errorFound = true;
     }
 
-    return false;
+    if (!$this->isPasswordLengthOkay($password)) {
+      $errorFound = true;
+    }
+
+    if (!$this->checkIfPasswordsMatch($password, $repeatPassword)) {
+      $errorFound = true;
+    }
+
+    if ($this->checkIfUsernameExists($username)) {
+      $errorFound = true;
+    }
+
+    if ($this->checkUsernameInvalidCharacters($username)) {
+      $errorFound = true;
+    }
+
+    return $errorFound;
   }
 
   private function isUsernameLengthOkay(string $username) : bool {

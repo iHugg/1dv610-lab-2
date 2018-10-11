@@ -11,7 +11,7 @@ class LayoutView {
     $this->loginView = $loginView;
     $this->dateTimeView = new DateTimeView();
     $this->registerView = $registerView;
-    $this->query = "?register";
+    $this->query = "register=1";
   }
   
   public function render(bool $isLoggedIn) {
@@ -45,7 +45,7 @@ class LayoutView {
   }
 
   private function getContent() : string {
-    if ($_SERVER["QUERY_STRING"] == "register") {
+    if ($_SERVER["QUERY_STRING"] == $this->query) {
       return $this->registerView->generateRegisterFormHTML();
      } else {
       return $this->loginView->response();
@@ -66,7 +66,7 @@ class LayoutView {
       $location = "/1dv610-lab-2";
     }
 
-    return '<a href="' . $location . '/index.php' . $query . '" id="register">' . $aTagMessage . '</a>';
+    return '<a href="' . $location . '/index.php?' . $query . '" id="register">' . $aTagMessage . '</a>';
   }
 
   public function redirectToLoginPage() {
@@ -74,6 +74,6 @@ class LayoutView {
   }
 
   public function redirectToRegisterPage() {
-    header("Location: http://" . $_SERVER["HTTP_HOST"] . $_SERVER["PHP_SELF"] . $this->query);
+    header("Location: http://" . $_SERVER["HTTP_HOST"] . $_SERVER["PHP_SELF"] . "?" . $this->query);
   }
 }

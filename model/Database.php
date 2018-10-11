@@ -27,5 +27,10 @@ class Database {
 
     return "";
   }
+
+  public function addUserToDatabase(string $username, string $password) : bool {
+    $sql = 'INSERT INTO users (username, password) VALUES ("' . $username . '", "' . password_hash($password, PASSWORD_BCRYPT) . '")';
+    return $this->connection->query($sql);
+  }
 }
 ?>
