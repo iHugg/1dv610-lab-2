@@ -38,6 +38,7 @@ class RegisterController {
     }
   }
 
+  //  Really ugly solution, can't think of another way of checking all issues after first issue has been found.
   private function checkIfCredentialsAreWrong() : bool {
     $username = $this->registerView->getUsername();
     $password = $this->registerView->getPassword();
@@ -70,7 +71,7 @@ class RegisterController {
 
   private function isUsernameLengthOkay(string $username) : bool {
     if (strlen($username) < $this->usernameMinCharacters) {
-      $this->session->setMessage("Username has too few characters, at least " . $this->usernameMinCharacters . " characters.<br>");
+      $this->session->addToMessage("Username has too few characters, at least " . $this->usernameMinCharacters . " characters.");
       return false;
     }
 
@@ -79,7 +80,7 @@ class RegisterController {
 
   private function isPasswordLengthOkay(string $password) : bool {
     if (strlen($password) < $this->passwordMinCharacters) {
-      $this->session->addToMessage("Password has too few characters, at least " . $this->passwordMinCharacters . " characters.<br>");
+      $this->session->addToMessage("Password has too few characters, at least " . $this->passwordMinCharacters . " characters.");
       return false;
     }
 
@@ -88,7 +89,7 @@ class RegisterController {
 
   private function checkIfPasswordsMatch(string $password, string $repeatPassword) : bool {
     if ($password != $repeatPassword) {
-      $this->session->addToMessage("Passwords do not match.<br>");
+      $this->session->addToMessage("Passwords do not match.");
       return false;
     }
 
@@ -97,7 +98,7 @@ class RegisterController {
 
   private function checkIfUsernameExists(string $username) : bool {
     if ($this->database->userExists($username)) {
-      $this->session->addToMessage("User exists, pick another username.<br>");
+      $this->session->addToMessage("User exists, pick another username.");
       return true;
     }
 

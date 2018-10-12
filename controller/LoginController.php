@@ -6,12 +6,14 @@
     private $layoutView;
     private $session;
     private $database;
+    private $browserDatabase;
 
     public function __construct(\view\LoginView $loginView, \view\LayoutView $layoutView) {
       $this->loginView = $loginView;
       $this->layoutView = $layoutView;
       $this->session = new \model\Session();
       $this->database = new \model\Database();
+      $this->browserDatabase = new \model\BrowserDatabase();
     }
 
     public function handleLoginByCookies() {
@@ -70,9 +72,15 @@
       if ($this->loginView->wantsToStayLoggedIn()) {
         $username = $user->getUsername();
         $hashedPassword = $this->database->getHashedPassword($username);
+        $hashedPassword = password_hash($hashedPassword, PASSWORD_BCRYPT);
         $this->loginView->setLoginCookies($username, $hashedPassword);
+        $this->saveCookieInformation($hashedPassword);
         $this->session->setMessage("Welcome and you will be remembered");
       }
+    }
+
+    private function saveCookieInformation(string $hashedPassword) {
+      $this->browserDatabase->saveBrowser($this->layoutView->getBrowser(), $hashedPassword);
     }
   }
 ?>

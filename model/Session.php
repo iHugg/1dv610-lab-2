@@ -5,6 +5,7 @@ class Session {
   private static $message = "flash";
   private static $loggedIn = "loggedIn";
   private static $enteredUsername = "enteredUsername";
+  private static $browserName = "browser";
 
   public function __construct() {
     if (!isset($_SESSION[self::$message])) {
@@ -23,7 +24,7 @@ class Session {
   }
 
   public function addToMessage(string $message) {
-    $_SESSION[self::$message] .= $message;
+    $_SESSION[self::$message] .= $message . "<br>";
   }
 
   public function isMessageEmpty() : bool {
@@ -44,6 +45,18 @@ class Session {
 
   public function setEnteredUsername(string $enteredUsername) {
     $_SESSION[self::$enteredUsername] = $enteredUsername;
+  }
+
+  public function getBrowserName() : string {
+    return $_SESSION[self::$browserName];
+  }
+
+  public function setBrowserName(string $browserName) {
+    $_SESSION[self::$browserName] = $browserName;
+  }
+
+  public function isBrowserSet() {
+    return isset($_SESSION[self::$browserName]);
   }
 }
 ?>

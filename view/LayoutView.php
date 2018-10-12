@@ -14,7 +14,13 @@ class LayoutView {
     $this->query = "register=1";
   }
   
-  public function render(bool $isLoggedIn) {
+  public function render(bool $isLoggedIn, bool $tamperingFound) {
+    $mainBody = $this->getContent($isLoggedIn);
+    if ($tamperingFound) {
+      $isLoggedIn = false;
+      $mainBody = $this->loginView->response($isLoggedIn);
+    }
+
     echo '<!DOCTYPE html>
       <html>
         <head>
@@ -27,7 +33,7 @@ class LayoutView {
           ' . $this->renderIsLoggedIn($isLoggedIn) . '
           
           <div class="container">
-              ' . $this->getContent() . '
+              ' . $mainBody . '
               ' . $this->dateTimeView->show() . '
           </div>
          </body>
@@ -44,11 +50,11 @@ class LayoutView {
     }
   }
 
-  private function getContent() : string {
+  private function getContent(bool $isLoggedIn) : string {
     if ($_SERVER["QUERY_STRING"] == $this->query) {
       return $this->registerView->generateRegisterFormHTML();
      } else {
-      return $this->loginView->response();
+      return $this->loginView->response($isLoggedIn);
      }
   }
 
@@ -75,5 +81,9 @@ class LayoutView {
 
   public function redirectToRegisterPage() {
     header("Location: http://" . $_SERVER["HTTP_HOST"] . $_SERVER["PHP_SELF"] . "?" . $this->query);
+  }
+
+  public function getBrowser() {
+    return $_SERVER["HTTP_USER_AGENT"];
   }
 }
