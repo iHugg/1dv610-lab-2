@@ -6,16 +6,16 @@ class RegisterController {
   private $layoutView;
   private $session;
   private $database;
-  private $usernameMinCharacters;
-  private $passwordMinCharacters;
+  private $userLimits;
+  private $flashPrinter;
 
   public function __construct(\view\RegisterView $registerView, \view\LayoutView $layoutView) {
     $this->registerView = $registerView;
     $this->layoutView = $layoutView;
-    $this->session = new \model\Session();
+    $this->session = new \view\Session();
+    $this->flashPrinter = new \view\FlashMessagePrinter();
     $this->database = new \model\Database();
-    $this->usernameMinCharacters = 3;
-    $this->passwordMinCharacters = 6;
+    $this->userLimits = new \model\UserLimitations();
   }
 
   public function handleRegister() {
@@ -32,9 +32,9 @@ class RegisterController {
     $password = $this->registerView->getPassword();
 
     if ($this->database->addUserToDatabase($username, $password)) {
-      $this->session->setMessage("Registered new user.");
+      $this->flashPrinter->userRegistered();
     } else {
-      $this->session->setMessage("Something went wrong when registering the user.");
+      $this->flashPrinter->registerDatabaseError();
     }
   }
 
@@ -70,8 +70,8 @@ class RegisterController {
   }
 
   private function isUsernameLengthOkay(string $username) : bool {
-    if (strlen($username) < $this->usernameMinCharacters) {
-      $this->session->addToMessage("Username has too few characters, at least " . $this->usernameMinCharacters . " characters.");
+    if (strlen($username) < $this->userLimits->getUsernameMinLength()) {
+      $this->flashPrinter->usernameTooShort();
       return false;
     }
 
@@ -79,8 +79,8 @@ class RegisterController {
   }
 
   private function isPasswordLengthOkay(string $password) : bool {
-    if (strlen($password) < $this->passwordMinCharacters) {
-      $this->session->addToMessage("Password has too few characters, at least " . $this->passwordMinCharacters . " characters.");
+    if (strlen($password) < $this->userLimits->getPasswordMinLength()) {
+      $this->flashPrinter->passwordTooShort();
       return false;
     }
 
@@ -89,7 +89,7 @@ class RegisterController {
 
   private function checkIfPasswordsMatch(string $password, string $repeatPassword) : bool {
     if ($password != $repeatPassword) {
-      $this->session->addToMessage("Passwords do not match.");
+      $this->flashPrinter->passwordsDontMatch();
       return false;
     }
 
@@ -98,7 +98,7 @@ class RegisterController {
 
   private function checkIfUsernameExists(string $username) : bool {
     if ($this->database->userExists($username)) {
-      $this->session->addToMessage("User exists, pick another username.");
+      $this->flashPrinter->usernameAlreadyExists();
       return true;
     }
 
@@ -119,7 +119,7 @@ class RegisterController {
   private function removeTagsFromUsername(string $username) {
     $username = strip_tags($username);
     $this->session->setEnteredUsername(preg_replace('/[^A-Za-z0-9\-]/', '', $username));
-    $this->session->addToMessage("Username contains invalid characters.");
+    $this->flashPrinter->invalidCharacter();
   }
 }
 ?>

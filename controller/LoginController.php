@@ -11,7 +11,8 @@
     public function __construct(\view\LoginView $loginView, \view\LayoutView $layoutView) {
       $this->loginView = $loginView;
       $this->layoutView = $layoutView;
-      $this->session = new \model\Session();
+      $this->session = new \view\Session();
+      $this->flashPrinter = new \view\FlashMessagePrinter();
       $this->database = new \model\Database();
       $this->browserDatabase = new \model\BrowserDatabase();
     }
@@ -20,9 +21,8 @@
       $cookieUser = $this->loginView->getCookieUser();
       $hashedPassword = $this->database->getHashedPassword($cookieUser->getUsername());
       if (password_verify($hashedPassword, $cookieUser->getPassword())) {
-        $loggedIn = true;
-        $this->session->setMessage("Welcome back with cookie");
-        $this->session->setLoggedIn($loggedIn);
+        $this->flashPrinter->loggedInWithCookies();
+        $this->session->login();
       }
     }
 
@@ -37,10 +37,10 @@
 
     private function areCredentialsEmpty(\model\User $user) : bool {
       if ($user->isUsernameEmpty()) {
-        $this->session->setMessage("Username is missing");
+        $this->flashPrinter->usernameMissing();
         return true;
       } else if ($user->isPasswordEmpty()) {
-        $this->session->setMessage("Password is missing");
+        $this->flashPrinter->passwordMissing();
         $this->session->setEnteredUsername($user->getUsername());
         return true;
       }
@@ -52,12 +52,11 @@
       $hashedPassword = $this->database->getHashedPassword($user->getUsername());
 
       if ($user->passwordsMatch($hashedPassword)) {
-        $loggedIn = true;
-        $this->session->setMessage("Welcome");
-        $this->session->setLoggedIn($loggedIn);
+        $this->flashPrinter->loggedIn();
+        $this->session->login();
         $this->handleStayLoggedIn($user);
       } else {
-        $this->session->setMessage("Wrong name or password");
+        $this->flashPrinter->wrongCredentials();
         $this->session->setEnteredUsername($user->getUsername());
       }
     }
@@ -75,7 +74,7 @@
         $hashedPassword = password_hash($hashedPassword, PASSWORD_BCRYPT);
         $this->loginView->setLoginCookies($username, $hashedPassword);
         $this->saveCookieInformation($hashedPassword);
-        $this->session->setMessage("Welcome and you will be remembered");
+        $this->flashPrinter->rememberLogin();
       }
     }
 

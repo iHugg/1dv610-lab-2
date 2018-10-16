@@ -13,7 +13,7 @@ class LoginView {
   private $session;
 
   public function __construct() {
-    $this->session = new \model\Session();
+    $this->session = new Session();
   }
 
 	/**
@@ -74,11 +74,6 @@ class LoginView {
 				</fieldset>
 			</form>
 		';
-	}
-	
-	//CREATE GET-FUNCTIONS TO FETCH REQUEST VARIABLES
-	private function getRequestUserName() {
-		//RETURN REQUEST VARIABLE: USERNAME
 	}
   
   public function wantsToLogin() : bool {

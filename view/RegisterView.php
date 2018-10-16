@@ -11,7 +11,7 @@ class RegisterView {
   private $session;
 
   public function __construct() {
-    $this->session = new \model\Session();
+    $this->session = new Session();
   }
 
   public function generateRegisterFormHTML() : string {

@@ -11,7 +11,7 @@ class TamperingController {
     $this->layoutView = $layoutView;
     $this->loginView = $loginView;
     $this->browserDatabase = new \model\BrowserDatabase();
-    $this->session = new \model\Session();
+    $this->session = new \view\Session();
   }
 
   public function hasCookieBeenTamperedWith() : bool {

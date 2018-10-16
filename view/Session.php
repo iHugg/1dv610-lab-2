@@ -1,5 +1,5 @@
 <?php
-namespace model;
+namespace view;
 
 class Session {
   private static $message = "flash";
@@ -35,8 +35,12 @@ class Session {
     return $_SESSION[self::$loggedIn];
   }
 
-  public function setLoggedIn(bool $loggedIn) {
-    $_SESSION[self::$loggedIn] = $loggedIn;
+  public function login() {
+    $_SESSION[self::$loggedIn] = true;
+  }
+
+  public function logout() {
+    $_SESSION[self::$loggedIn] = false;
   }
 
   public function getEnteredUsername() : string {
