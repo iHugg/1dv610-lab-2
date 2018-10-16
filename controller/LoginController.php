@@ -51,7 +51,7 @@
     private function checkLoginCredentials(\model\User $user) {
       $hashedPassword = $this->database->getHashedPassword($user->getUsername());
 
-      if ($user->passwordsMatch($hashedPassword)) {
+      if ($user->HashedPasswordMatch($hashedPassword)) {
         $this->sessionPrinter->loggedIn();
         $this->session->login();
         $this->handleStayLoggedIn($user);

@@ -62,7 +62,7 @@ class MasterController {
       $this->registerController->handleRegister();
     } else if ($this->loginView->loginCookiesExist() && !$this->session->isLoggedIn()) {
       $this->loginController->handleLoginByCookies();
-      $this->isLoggedIn = $session->isLoggedIn();
+      $this->isLoggedIn = $this->session->isLoggedIn();
     }
   }
 

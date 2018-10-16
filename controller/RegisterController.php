@@ -45,72 +45,34 @@ class RegisterController {
     $repeatPassword = $this->registerView->getRepeatPassword();
     $this->sessionPrinter->setRegisterEnteredUsername();
     $errorFound = false;
+    $user = new \model\User($username, $password);
 
-    if (!$this->isUsernameLengthOkay($username)) {
+    if ($user->usernameIsTooShort()) {
+      $this->sessionPrinter->usernameTooShort();
       $errorFound = true;
     }
 
-    if (!$this->isPasswordLengthOkay($password)) {
+    if ($user->passwordIsTooShort()) {
+      $this->sessionPrinter->passwordTooShort();
       $errorFound = true;
     }
 
-    if (!$this->checkIfPasswordsMatch($password, $repeatPassword)) {
+    if (!$user->passwordsMatch($repeatPassword)) {
+      $this->sessionPrinter->passwordsDontMatch();
       $errorFound = true;
     }
 
-    if ($this->checkIfUsernameExists($username)) {
+    if ($this->database->userExists($user->getUsername())) {
+      $this->sessionPrinter->usernameAlreadyExists();
       $errorFound = true;
     }
 
-    if ($this->checkUsernameInvalidCharacters($username)) {
+    if ($user->usernameHasInvalidChar()) {
+      $this->sessionPrinter->invalidCharacter();
       $errorFound = true;
     }
 
     return $errorFound;
-  }
-
-  private function isUsernameLengthOkay(string $username) : bool {
-    if (strlen($username) < $this->userLimits->getUsernameMinLength()) {
-      $this->sessionPrinter->usernameTooShort();
-      return false;
-    }
-
-    return true;
-  }
-
-  private function isPasswordLengthOkay(string $password) : bool {
-    if (strlen($password) < $this->userLimits->getPasswordMinLength()) {
-      $this->sessionPrinter->passwordTooShort();
-      return false;
-    }
-
-    return true;
-  }
-
-  private function checkIfPasswordsMatch(string $password, string $repeatPassword) : bool {
-    if ($password != $repeatPassword) {
-      $this->sessionPrinter->passwordsDontMatch();
-      return false;
-    }
-
-    return true;
-  }
-
-  private function checkIfUsernameExists(string $username) : bool {
-    if ($this->database->userExists($username)) {
-      $this->sessionPrinter->usernameAlreadyExists();
-      return true;
-    }
-
-    return false;
-  }
-
-  private function checkUsernameInvalidCharacters(string $username) : bool {
-    if (preg_match('(<|>)', $username) === 1) {
-      $this->sessionPrinter->invalidCharacter();
-      return true;
-    }
-    return false;
   }
 }
 ?>
