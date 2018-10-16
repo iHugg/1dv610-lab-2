@@ -7,13 +7,13 @@ class RegisterController {
   private $session;
   private $database;
   private $userLimits;
-  private $flashPrinter;
+  private $sessionPrinter;
 
   public function __construct(\view\RegisterView $registerView, \view\LayoutView $layoutView) {
     $this->registerView = $registerView;
     $this->layoutView = $layoutView;
     $this->session = new \view\Session();
-    $this->flashPrinter = new \view\FlashMessagePrinter();
+    $this->sessionPrinter = new \view\SessionPrinter();
     $this->database = new \model\Database();
     $this->userLimits = new \model\UserLimitations();
   }
@@ -32,9 +32,9 @@ class RegisterController {
     $password = $this->registerView->getPassword();
 
     if ($this->database->addUserToDatabase($username, $password)) {
-      $this->flashPrinter->userRegistered();
+      $this->sessionPrinter->userRegistered();
     } else {
-      $this->flashPrinter->registerDatabaseError();
+      $this->sessionPrinter->registerDatabaseError();
     }
   }
 
@@ -43,7 +43,7 @@ class RegisterController {
     $username = $this->registerView->getUsername();
     $password = $this->registerView->getPassword();
     $repeatPassword = $this->registerView->getRepeatPassword();
-    $this->session->setEnteredUsername($username);
+    $this->sessionPrinter->setRegisterEnteredUsername();
     $errorFound = false;
 
     if (!$this->isUsernameLengthOkay($username)) {
@@ -71,7 +71,7 @@ class RegisterController {
 
   private function isUsernameLengthOkay(string $username) : bool {
     if (strlen($username) < $this->userLimits->getUsernameMinLength()) {
-      $this->flashPrinter->usernameTooShort();
+      $this->sessionPrinter->usernameTooShort();
       return false;
     }
 
@@ -80,7 +80,7 @@ class RegisterController {
 
   private function isPasswordLengthOkay(string $password) : bool {
     if (strlen($password) < $this->userLimits->getPasswordMinLength()) {
-      $this->flashPrinter->passwordTooShort();
+      $this->sessionPrinter->passwordTooShort();
       return false;
     }
 
@@ -89,7 +89,7 @@ class RegisterController {
 
   private function checkIfPasswordsMatch(string $password, string $repeatPassword) : bool {
     if ($password != $repeatPassword) {
-      $this->flashPrinter->passwordsDontMatch();
+      $this->sessionPrinter->passwordsDontMatch();
       return false;
     }
 
@@ -98,7 +98,7 @@ class RegisterController {
 
   private function checkIfUsernameExists(string $username) : bool {
     if ($this->database->userExists($username)) {
-      $this->flashPrinter->usernameAlreadyExists();
+      $this->sessionPrinter->usernameAlreadyExists();
       return true;
     }
 
@@ -106,20 +106,11 @@ class RegisterController {
   }
 
   private function checkUsernameInvalidCharacters(string $username) : bool {
-    foreach (str_split($username) as $char) {
-      if ($char == '>' || $char == '<') {
-        $this->removeTagsFromUsername($username);
-        return true;
-      }
+    if (preg_match('(<|>)', $username) === 1) {
+      $this->sessionPrinter->invalidCharacter();
+      return true;
     }
-
     return false;
-  }
-
-  private function removeTagsFromUsername(string $username) {
-    $username = strip_tags($username);
-    $this->session->setEnteredUsername(preg_replace('/[^A-Za-z0-9\-]/', '', $username));
-    $this->flashPrinter->invalidCharacter();
   }
 }
 ?>

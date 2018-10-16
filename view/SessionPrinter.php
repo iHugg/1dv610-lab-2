@@ -1,13 +1,17 @@
 <?php
 namespace view;
 
-class FlashMessagePrinter {
+class SessionPrinter {
   private $session;
+  private $loginView;
+  private $registerView;
   private $userLimits;
 
   public function __construct() {
     $this->session = new Session();
     $this->userLimits = new \model\UserLimitations();
+    $this->loginView = new LoginView();
+    $this->registerView = new RegisterView();
   }
 
   public function loggedIn() {
@@ -72,6 +76,22 @@ class FlashMessagePrinter {
 
   public function emptyMessage() {
     $this->session->setMessage("");
+  }
+
+  public function setLoginEnteredUsername() {
+    $enteredUsername = $this->loginView->getEnteredUsername();
+    $this->session->setEnteredUsername($enteredUsername);
+  }
+
+  public function setRegisterEnteredUsername() {
+    $enteredUsername = $this->registerView->getUsername();
+    $username = $this->removeTagsAndInvalidCharacters($enteredUsername);
+    $this->session->setEnteredUsername($username);
+  }
+
+  private function removeTagsAndInvalidCharacters(string $username) : string {
+    $username = strip_tags($username);
+    return preg_replace('/[^A-Za-z0-9\-]/', '', $username);
   }
 }
 ?>

@@ -12,7 +12,7 @@
       $this->loginView = $loginView;
       $this->layoutView = $layoutView;
       $this->session = new \view\Session();
-      $this->flashPrinter = new \view\FlashMessagePrinter();
+      $this->sessionPrinter = new \view\SessionPrinter();
       $this->database = new \model\Database();
       $this->browserDatabase = new \model\BrowserDatabase();
     }
@@ -21,7 +21,7 @@
       $cookieUser = $this->loginView->getCookieUser();
       $hashedPassword = $this->database->getHashedPassword($cookieUser->getUsername());
       if (password_verify($hashedPassword, $cookieUser->getPassword())) {
-        $this->flashPrinter->loggedInWithCookies();
+        $this->sessionPrinter->loggedInWithCookies();
         $this->session->login();
       }
     }
@@ -37,11 +37,11 @@
 
     private function areCredentialsEmpty(\model\User $user) : bool {
       if ($user->isUsernameEmpty()) {
-        $this->flashPrinter->usernameMissing();
+        $this->sessionPrinter->usernameMissing();
         return true;
       } else if ($user->isPasswordEmpty()) {
-        $this->flashPrinter->passwordMissing();
-        $this->session->setEnteredUsername($user->getUsername());
+        $this->sessionPrinter->passwordMissing();
+        $this->sessionPrinter->setLoginEnteredUsername();
         return true;
       }
 
@@ -52,12 +52,12 @@
       $hashedPassword = $this->database->getHashedPassword($user->getUsername());
 
       if ($user->passwordsMatch($hashedPassword)) {
-        $this->flashPrinter->loggedIn();
+        $this->sessionPrinter->loggedIn();
         $this->session->login();
         $this->handleStayLoggedIn($user);
       } else {
-        $this->flashPrinter->wrongCredentials();
-        $this->session->setEnteredUsername($user->getUsername());
+        $this->sessionPrinter->wrongCredentials();
+        $this->sessionPrinter->setLoginEnteredUsername();
       }
     }
 
@@ -74,7 +74,7 @@
         $hashedPassword = password_hash($hashedPassword, PASSWORD_BCRYPT);
         $this->loginView->setLoginCookies($username, $hashedPassword);
         $this->saveCookieInformation($hashedPassword);
-        $this->flashPrinter->rememberLogin();
+        $this->sessionPrinter->rememberLogin();
       }
     }
 

@@ -12,6 +12,7 @@ class Session {
       $_SESSION[self::$message] = "";
       $_SESSION[self::$loggedIn] = false;
       $_SESSION[self::$enteredUsername] = "";
+      $this->setBrowserName();
     }
   }
 
@@ -55,8 +56,8 @@ class Session {
     return $_SESSION[self::$browserName];
   }
 
-  public function setBrowserName(string $browserName) {
-    $_SESSION[self::$browserName] = $browserName;
+  private function setBrowserName() {
+    $_SESSION[self::$browserName] = $_SERVER["HTTP_USER_AGENT"];
   }
 
   public function isBrowserSet() {
