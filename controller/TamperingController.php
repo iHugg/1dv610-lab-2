@@ -3,15 +3,15 @@ namespace controller;
 
 class TamperingController extends BaseController {
 
-  public function __construct() {
-    parent::__construct();
+  public function __construct(\mysqli $connection) {
+    parent::__construct($connection);
   }
 
   public function hasCookieBeenTamperedWith() : bool {
     $currentBrowser = $this->layoutView->getBrowser();
     $cookieUser = $this->loginView->getCookieUser();
 
-    $passwordCookie = $this->browserDatabase->getCookiePassword($currentBrowser);
+    $passwordCookie = $this->browserSQL->getCookiePassword($currentBrowser);
 
     return $cookieUser->getPassword() != $passwordCookie;
   }

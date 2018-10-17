@@ -8,18 +8,20 @@ class BaseController {
   protected $threadView;
   protected $sessionPrinter;
   protected $session;
-  protected $database;
-  protected $browserDatabase;
+  protected $browserSQL;
+  protected $userSQL;
+  protected $threadSQL;
 
-  public function __construct() {
+  public function __construct(\mysqli $connection) {
     $this->loginView = new \view\LoginView();
     $this->registerView = new \view\RegisterView();
-    $this->layoutView = new \view\LayoutView($this->loginView, $this->registerView);
-    $this->threadView = new \view\ThreadView();
+    $this->layoutView = new \view\LayoutView($this->loginView, $this->registerView, $connection);
+    $this->threadView = new \view\ThreadView($connection);
     $this->sessionPrinter = new \view\SessionPrinter();
     $this->session = new \view\Session();
-    $this->database = new \model\Database();
-    $this->browserDatabase = new \model\BrowserDatabase();
+    $this->browserSQL = new \model\BrowserSQL($connection);
+    $this->userSQL = new \model\UserSQL($connection);
+    $this->threadSQL = new \model\ThreadSQL($connection);
   }
 }
 ?>

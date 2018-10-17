@@ -2,15 +2,14 @@
 namespace controller;
 
 class ThreadController extends BaseController {
-  private $threadDatabase;
 
-  public function __construct() {
-    parent::__construct();
-    $this->threadDatabase = new \model\ThreadDatabase();
+  public function __construct(\mysqli $connection) {
+    parent::__construct($connection);
   }
+  
   public function createThread() {
     $title = $this->threadView->getTitle();
-    $this->threadDatabase->saveThread($title);
+    $this->threadSQL->saveThread($title);
     $this->layoutView->redirectToThreadPage();
   }
 }

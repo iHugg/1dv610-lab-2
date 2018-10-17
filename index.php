@@ -16,8 +16,9 @@ require_once('controller/TamperingController.php');
 require_once('controller/MasterController.php');
 require_once('controller/ThreadController.php');
 require_once('model/Database.php');
-require_once('model/BrowserDatabase.php');
-require_once('model/ThreadDatabase.php');
+require_once('model/UserSQL.php');
+require_once('model/BrowserSQL.php');
+require_once('model/ThreadSQL.php');
 require_once('model/User.php');
 
 //MAKE SURE ERRORS ARE SHOWN... MIGHT WANT TO TURN THIS OFF ON A PUBLIC SERVER

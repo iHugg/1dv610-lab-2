@@ -3,13 +3,13 @@
 
   class LoginController extends BaseController {
 
-    public function __construct() {
-      parent::__construct();
+    public function __construct(\mysqli $connection) {
+      parent::__construct($connection);
     }
 
     public function handleLoginByCookies() {
       $cookieUser = $this->loginView->getCookieUser();
-      $hashedPassword = $this->database->getHashedPassword($cookieUser->getUsername());
+      $hashedPassword = $this->userSQL->getHashedPassword($cookieUser->getUsername());
       if (password_verify($hashedPassword, $cookieUser->getPassword())) {
         $this->sessionPrinter->loggedInWithCookies();
         $this->session->login();
@@ -39,7 +39,7 @@
     }
 
     private function checkLoginCredentials(\model\User $user) {
-      $hashedPassword = $this->database->getHashedPassword($user->getUsername());
+      $hashedPassword = $this->userSQL->getHashedPassword($user->getUsername());
 
       if ($user->HashedPasswordMatch($hashedPassword)) {
         $this->sessionPrinter->loggedIn();
@@ -60,7 +60,7 @@
     private function handleStayLoggedIn(\model\User $user) {
       if ($this->loginView->wantsToStayLoggedIn()) {
         $username = $user->getUsername();
-        $hashedPassword = $this->database->getHashedPassword($username);
+        $hashedPassword = $this->userSQL->getHashedPassword($username);
         $hashedPassword = password_hash($hashedPassword, PASSWORD_BCRYPT);
         $this->loginView->setLoginCookies($username, $hashedPassword);
         $this->saveCookieInformation($hashedPassword);
@@ -69,7 +69,7 @@
     }
 
     private function saveCookieInformation(string $hashedPassword) {
-      $this->browserDatabase->saveBrowser($this->layoutView->getBrowser(), $hashedPassword);
+      $this->browserSQL->saveBrowser($this->layoutView->getBrowser(), $hashedPassword);
     }
   }
 ?>

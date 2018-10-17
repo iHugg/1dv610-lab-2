@@ -3,8 +3,8 @@ namespace controller;
 
 class RegisterController extends BaseController {
 
-  public function __construct() {
-    parent::__construct();
+  public function __construct(\mysqli $connection) {
+    parent::__construct($connection);
   }
 
   public function handleRegister() {
@@ -20,7 +20,7 @@ class RegisterController extends BaseController {
     $username = $this->registerView->getUsername();
     $password = $this->registerView->getPassword();
 
-    if ($this->database->addUserToDatabase($username, $password)) {
+    if ($this->userSQL->addUserToDatabase($username, $password)) {
       $this->sessionPrinter->userRegistered();
     } else {
       $this->sessionPrinter->registerDatabaseError();
@@ -51,7 +51,7 @@ class RegisterController extends BaseController {
       $errorFound = true;
     }
 
-    if ($this->database->userExists($user->getUsername())) {
+    if ($this->userSQL->userExists($user->getUsername())) {
       $this->sessionPrinter->usernameAlreadyExists();
       $errorFound = true;
     }

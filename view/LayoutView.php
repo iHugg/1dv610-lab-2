@@ -9,11 +9,12 @@ class LayoutView {
   private $registerQuery;
   private $threadQuery;
 
-  public function __construct(LoginView $loginView, RegisterView $registerView) {
+  public function __construct(LoginView $loginView, RegisterView $registerView, \mysqli $connection) {
     $this->loginView = $loginView;
     $this->dateTimeView = new DateTimeView();
     $this->registerView = $registerView;
-    $this->threadView = new ThreadView();
+    $this->threadView = new ThreadView($connection);
+    $this->connection = $connection;
     $this->registerQuery = "register=1";
     $this->threadQuery = "thread=1";
   }
@@ -104,7 +105,7 @@ class LayoutView {
   }
 
   public function redirectToRegisterPage() {
-    header("Location: http://" . $_SERVER["HTTP_HOST"] . $_SERVER["PHP_SELF"] . "?" . $this->query);
+    header("Location: http://" . $_SERVER["HTTP_HOST"] . $_SERVER["PHP_SELF"] . "?" . $this->registerQuery);
   }
 
   public function redirectToThreadPage() {

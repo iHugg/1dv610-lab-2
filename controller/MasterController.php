@@ -7,16 +7,19 @@ class MasterController extends BaseController {
   private $registerController;
   private $tamperingController;
   private $threadController;
+  private $database;
   private $tamperingFound;
   private $isLoggedIn;
 
   public function __construct() {
-    parent::__construct();
-    $this->loginController = new LoginController();
-    $this->logoutController = new LogoutController();
-    $this->registerController = new RegisterController();
-    $this->tamperingController = new TamperingController($this->layoutView, $this->loginView);
-    $this->threadController = new ThreadController();
+    $this->database = new \model\Database();
+    $this->connection = $this->database->getConnection();
+    parent::__construct($this->connection);
+    $this->loginController = new LoginController($this->connection);
+    $this->logoutController = new LogoutController($this->connection);
+    $this->registerController = new RegisterController($this->connection);
+    $this->tamperingController = new TamperingController($this->connection);
+    $this->threadController = new ThreadController($this->connection);
     $this->tamperingFound = false;
     $this->isLoggedIn = $this->session->isLoggedIn();
   }

@@ -6,32 +6,36 @@ class ThreadView {
   private static $threadTitle = "ThreadView::Title";
   private static $createThread = "TitleView::CreateThread";
   private static $createThreadValue = "createThread";
+  private $threadSQL;
   private $session;
   private $createThreadQuery;
 
-  public function __construct() {
+  public function __construct(\mysqli $connection) {
+    $this->threadSQL = new \model\ThreadSQL($connection);
     $this->session = new Session();
     $this->createThreadQuery = "createThread=1";
   }
 
-  public function getCreateThreadQuery() {
+  public function getCreateThreadQuery() : string {
     return $this->createThreadQuery;
   }
 
-  public function generateThreadHTML() {
+  public function generateThreadHTML() : string {
     return '
     <h2>Threads</h2>
     ' . $this->generateCreateThreadLink() . '
     ';
   }
 
-  public function generateCreateThreadLink() {
+  public function generateCreateThreadLink() : string {
     $location = $this->getLocation();
+    $html = '<a href="' . $location . '/index.php?' . $this->createThreadQuery . '">Create new thread</a><br>';
+    $html .= $this->generateThreadTitlesHTML();
 
-    return '<a href="' . $location . '/index.php?' . $this->createThreadQuery . '">Create new thread</a>';
+    return $html;
   }
 
-  public function generateCreateThreadHTML() {
+  public function generateCreateThreadHTML() : string {
     return '
     <h2>Create new thread</h2>
     <form method="post">
@@ -42,6 +46,22 @@ class ThreadView {
         <input type="text" id="' . self::$threadTitle . '" name="' . self::$threadTitle . '" value=""/><br>
         <input type="submit" name="' . self::$createThread . '" value="' . self::$createThreadValue . '" />
     ';
+  }
+
+  private function generateThreadTitlesHTML() {
+    $threads = $this->getSavedTitles();
+    $html = '';
+
+    if (count($threads) > 0) {
+      $html .= '
+      <fieldset>
+      <legend>Existing threads</legend>
+      ';
+      foreach($threads as $thread) {
+        $html .= '<a href="' . $this->getLocation() . '/index.php?' . $thread . '=1" style="margin:10px;">' . $thread . '</a>';
+      }
+    }
+    return $html;
   }
 
   private function getLocation() {
@@ -58,6 +78,10 @@ class ThreadView {
 
   public function getTitle() : string {
     return $_POST[self::$threadTitle];
+  }
+
+  private function getSavedTitles() {
+    return $this->threadSQL->getThreads();
   }
 }
 ?>

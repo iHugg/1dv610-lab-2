@@ -1,17 +1,11 @@
 <?php
 namespace model;
 
-class BrowserDatabase {
-  private $settings;
+class BrowserSQL {
   private $connection;
 
-  public function __construct() {
-    $this->settings = parse_ini_file("./settings.ini");
-    $this->connection = new \mysqli($this->settings["dbURL"], $this->settings["dbName"], $this->settings["dbPassword"], $this->settings["dbName"]);
-  }
-
-  public function __destruct() {
-    $this->connection->close();
+  public function __construct(\mysqli $connection) {
+    $this->connection = $connection;
   }
 
   public function saveBrowser(string $browser, string $hashedPassword) {
