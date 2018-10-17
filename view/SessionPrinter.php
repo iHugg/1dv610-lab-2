@@ -5,11 +5,9 @@ class SessionPrinter {
   private $session;
   private $loginView;
   private $registerView;
-  private $userLimits;
 
   public function __construct() {
     $this->session = new Session();
-    $this->userLimits = new \model\UserLimitations();
     $this->loginView = new LoginView();
     $this->registerView = new RegisterView();
   }
@@ -50,12 +48,12 @@ class SessionPrinter {
     $this->session->setMessage("Something went wrong when registering the user.");
   }
 
-  public function usernameTooShort() {
-    $this->session->addToMessage("Username has too few characters, at least " . $this->userLimits->getUsernameMinLength() . " characters.");
+  public function usernameTooShort(\model\User $user) {
+    $this->session->addToMessage("Username has too few characters, at least " . $user->getUsernameMinLength() . " characters.");
   }
 
-  public function passwordTooShort() {
-    $this->session->addToMessage("Password has too few characters, at least " . $this->userLimits->getPasswordMinLength() . " characters.");
+  public function passwordTooShort(\model\User $user) {
+    $this->session->addToMessage("Password has too few characters, at least " . $user->getPasswordMinLength() . " characters.");
   }
 
   public function passwordsDontMatch() {

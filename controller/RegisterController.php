@@ -1,21 +1,10 @@
 <?php
 namespace controller;
 
-class RegisterController {
-  private $registerView;
-  private $layoutView;
-  private $session;
-  private $database;
-  private $userLimits;
-  private $sessionPrinter;
+class RegisterController extends BaseController {
 
-  public function __construct(\view\RegisterView $registerView, \view\LayoutView $layoutView) {
-    $this->registerView = $registerView;
-    $this->layoutView = $layoutView;
-    $this->session = new \view\Session();
-    $this->sessionPrinter = new \view\SessionPrinter();
-    $this->database = new \model\Database();
-    $this->userLimits = new \model\UserLimitations();
+  public function __construct() {
+    parent::__construct();
   }
 
   public function handleRegister() {
@@ -48,12 +37,12 @@ class RegisterController {
     $user = new \model\User($username, $password);
 
     if ($user->usernameIsTooShort()) {
-      $this->sessionPrinter->usernameTooShort();
+      $this->sessionPrinter->usernameTooShort($user);
       $errorFound = true;
     }
 
     if ($user->passwordIsTooShort()) {
-      $this->sessionPrinter->passwordTooShort();
+      $this->sessionPrinter->passwordTooShort($user);
       $errorFound = true;
     }
 

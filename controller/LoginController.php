@@ -1,20 +1,10 @@
 <?php
   namespace controller;
 
-  class LoginController {
-    private $loginView;
-    private $layoutView;
-    private $session;
-    private $database;
-    private $browserDatabase;
+  class LoginController extends BaseController {
 
-    public function __construct(\view\LoginView $loginView, \view\LayoutView $layoutView) {
-      $this->loginView = $loginView;
-      $this->layoutView = $layoutView;
-      $this->session = new \view\Session();
-      $this->sessionPrinter = new \view\SessionPrinter();
-      $this->database = new \model\Database();
-      $this->browserDatabase = new \model\BrowserDatabase();
+    public function __construct() {
+      parent::__construct();
     }
 
     public function handleLoginByCookies() {

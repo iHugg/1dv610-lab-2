@@ -22,6 +22,14 @@ class User {
     return $this->password;
   }
 
+  public function getUsernameMinLength() : int {
+    return $this->usernameMinLength;
+  }
+
+  public function getPasswordMinLength() : int {
+    return $this->passwordMinLength;
+  }
+
   public function isUsernameEmpty() : bool {
     return $this->username == "";
   }

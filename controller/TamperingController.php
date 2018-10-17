@@ -1,17 +1,10 @@
 <?php
 namespace controller;
 
-class TamperingController {
-  private $layoutView;
-  private $loginView;
-  private $browserDatabase;
-  private $session;
+class TamperingController extends BaseController {
 
-  public function __construct(\view\LayoutView $layoutView, \view\LoginView $loginView) {
-    $this->layoutView = $layoutView;
-    $this->loginView = $loginView;
-    $this->browserDatabase = new \model\BrowserDatabase();
-    $this->session = new \view\Session();
+  public function __construct() {
+    parent::__construct();
   }
 
   public function hasCookieBeenTamperedWith() : bool {

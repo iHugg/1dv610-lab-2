@@ -1,17 +1,10 @@
 <?php
 namespace controller;
 
-class LogoutController {
-  private $loginView;
-  private $layoutView;
-  private $session;
-  private $sessionPrinter;
+class LogoutController extends BaseController {
 
-  public function __construct(\view\LoginView $loginView, \view\LayoutView $layoutView) {
-    $this->loginView = $loginView;
-    $this->layoutView = $layoutView;
-    $this->session = new \view\Session();
-    $this->sessionPrinter = new \view\SessionPrinter();
+  public function __construct() {
+    parent::__construct();
   }
 
   public function handleLogout() {

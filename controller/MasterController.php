@@ -1,29 +1,22 @@
 <?php
 namespace controller;
 
-class MasterController {
-  private $loginView;
-  private $registerView;
-  private $layoutView;
-  private $sessionPrinter;
-  private $session;
+class MasterController extends BaseController {
   private $loginController;
   private $logoutController;
   private $registerController;
   private $tamperingController;
+  private $threadController;
   private $tamperingFound;
   private $isLoggedIn;
 
   public function __construct() {
-    $this->loginView = new \view\LoginView();
-    $this->registerView = new \view\RegisterView();
-    $this->layoutView = new \view\LayoutView($this->loginView, $this->registerView);
-    $this->sessionPrinter = new \view\SessionPrinter();
-    $this->session = new \view\Session();
-    $this->loginController = new LoginController($this->loginView, $this->layoutView);
-    $this->logoutController = new LogoutController($this->loginView, $this->layoutView);
-    $this->registerController = new RegisterController($this->registerView, $this->layoutView);
+    parent::__construct();
+    $this->loginController = new LoginController();
+    $this->logoutController = new LogoutController();
+    $this->registerController = new RegisterController();
     $this->tamperingController = new TamperingController($this->layoutView, $this->loginView);
+    $this->threadController = new ThreadController();
     $this->tamperingFound = false;
     $this->isLoggedIn = $this->session->isLoggedIn();
   }
@@ -63,6 +56,8 @@ class MasterController {
     } else if ($this->loginView->loginCookiesExist() && !$this->session->isLoggedIn()) {
       $this->loginController->handleLoginByCookies();
       $this->isLoggedIn = $this->session->isLoggedIn();
+    } else if ($this->threadView->wantsToCreateThread()) {
+      $this->threadController->createThread();
     }
   }
 
