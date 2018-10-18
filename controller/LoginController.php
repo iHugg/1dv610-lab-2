@@ -13,6 +13,7 @@
       if (password_verify($hashedPassword, $cookieUser->getPassword())) {
         $this->sessionPrinter->loggedInWithCookies();
         $this->session->login();
+        $this->session->setUsername($cookieUser->getUsername());
       }
     }
 

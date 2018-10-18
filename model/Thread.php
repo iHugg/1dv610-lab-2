@@ -18,12 +18,12 @@ class Thread {
     $posts = json_decode($json, true);
 
     foreach($posts as $key => $post) {
-      $this->posts[] = new Post($post["post"]);
+      $this->posts[] = new Post($post["post"], $post["author"]);
     }
   }
 
-  public function addPost(string $post) {
-    $this->posts[] = new Post($post);
+  public function addPost(string $post, string $author) {
+    $this->posts[] = new Post($post, $author);
   }
 
   public function getPosts() : array {

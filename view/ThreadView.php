@@ -96,7 +96,7 @@ class ThreadView {
       foreach ($posts as $key => $post) {
         $postHtml .= '
         <fieldset>
-          <legend>Author: </legend>
+          <legend>' . $post["author"] . '</legend>
           <p>' . $post["post"] . '</p>
         </fieldset>
         ';
