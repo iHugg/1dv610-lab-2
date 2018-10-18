@@ -91,18 +91,30 @@ class ThreadView {
   private function getPosts() : string {
     $posts = $this->threadSQL->getPosts($this->getTitleFromURL());
     $postHtml = "";
+    $submitHtml = '<input type="submit" name="' . self::$deletePost . '" value="Delete post">';
+    $submit = "";
+    $threadAuthor = $this->threadSQL->getThreadAuthor($this->getTitleFromURL());
 
     if ($posts != "") {
       $posts = json_decode($posts, true);
 
       foreach ($posts as $key => $post) {
+        if ((!$this->session->isLoggedIn() || $this->session->getUsername() != $post["author"]) && $this->session->getUsername() != "Admin" &&
+        $this->session->getUsername() != $threadAuthor) {
+          $submit = "";
+        } else {
+          $submit = '
+          <input type="hidden" id="' . self::$postIdName . '" name="' . self::$postIdName . '" value="' . $post["id"] . '"/>
+          ' . $submitHtml . '
+          ';
+        }
+
         $postHtml .= '
         <form method="post">
           <fieldset>
             <legend>' . $post["author"] . '</legend>
-            <input type="hidden" id="' . self::$postIdName . '" name="' . self::$postIdName . '" value="' . $post["id"] . '"/>
             <p>' . $post["post"] . '</p>
-            <input type="submit" name="' . self::$deletePost . '" value="Delete post">
+            ' . $submit . '
           </fieldset>
         </form>
         ';

@@ -38,6 +38,17 @@ class ThreadSQL {
     return "";
   }
 
+  public function getThreadAuthor(string $title) : string {
+    $sql = 'SELECT threadAuthor FROM threads WHERE title = "' . $title . '"';
+    $result = $this->connection->query($sql);
+    if ($result->num_rows == 1) {
+      $author = $result->fetch_assoc();
+      return $author["threadAuthor"];
+    }
+
+    return "";
+  }
+
   public function savePosts(string $title, string $posts) {
     $posts = addslashes($posts);
     $sql = 'UPDATE threads SET posts="' . $posts . '" WHERE title="' . $title . '"';

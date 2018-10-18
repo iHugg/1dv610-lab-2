@@ -48,17 +48,21 @@ class Thread {
   }
 
   public function deletePost($id) {
+    $index = $this->getPostToDeleteIndex($id);
+    if ($index != -1) {
+      array_splice($this->posts, $index, 1);
+    }
+  }
+
+  private function getPostToDeleteIndex($id) : int {
     $index = -1;
-    for($i = 0; $i < count($this->posts); $i++) {
+    for ($i = 0; $i < count($this->posts); $i++) {
       if ($this->posts[$i]->id == $id) {
         $index = $i;
         break;
       }
     }
-
-    if ($index != -1) {
-      array_splice($this->posts, $index, 1);
-    }
+    return $index;
   }
 }
 ?>
