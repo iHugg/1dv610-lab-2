@@ -43,6 +43,7 @@
 
       if ($user->HashedPasswordMatch($hashedPassword)) {
         $this->sessionPrinter->loggedIn();
+        $this->session->setUsername($user->getUsername());
         $this->session->login();
         $this->handleStayLoggedIn($user);
       } else {

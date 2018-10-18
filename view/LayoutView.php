@@ -6,6 +6,7 @@ class LayoutView {
   private $dateTimeView;
   private $registerView;
   private $threadView;
+  private $postView;
   private $registerQuery;
   private $threadQuery;
 
@@ -14,9 +15,10 @@ class LayoutView {
     $this->dateTimeView = new DateTimeView();
     $this->registerView = $registerView;
     $this->threadView = new ThreadView($connection);
+    $this->postView = new PostView();
     $this->connection = $connection;
-    $this->registerQuery = "register=1";
-    $this->threadQuery = "thread=1";
+    $this->registerQuery = "register";
+    $this->threadQuery = "thread";
   }
   
   public function render(bool $isLoggedIn, bool $tamperingFound) {
@@ -58,13 +60,19 @@ class LayoutView {
 
   private function getContent(bool $isLoggedIn) : string {
     $queryString = $this->getQueryString();
-    if ($queryString == $this->registerQuery) {
+    parse_str($queryString, $result);
+    if (isset($result[$this->registerQuery])) {
       return $this->registerView->generateRegisterFormHTML();
-     } else if ($queryString == $this->threadQuery) {
+     } else if (isset($result[$this->threadQuery])) {
       return $this->threadView->generateThreadHTML();
-     } else if ($queryString == $this->threadView->getCreateThreadQuery()) {
+     } else if (isset($result[$this->threadView->getCreateThreadQuery()])) {
       return $this->threadView->generateCreateThreadHTML();
-     } else {
+     } else if (isset($result[$this->threadView->getCreatedThreadQuery()])) {
+      return $this->threadView->generateUserCreatedThreadHTML($result["title"]);
+     } else if (isset($result[$this->threadView->getCreatePostQuery()])) {
+      return $this->postView->generatePostHTML($result["title"]);
+     }
+      else {
       return $this->loginView->response($isLoggedIn);
      }
   }
@@ -79,11 +87,11 @@ class LayoutView {
     $aTagMessage = "Back to login";
 
     if (strlen($_SERVER["QUERY_STRING"]) == 0) {
-      $query = $this->registerQuery;
+      $query = $this->registerQuery . '=1';
       $aTagMessage = "Register a new user";
     }
 
-    return '<a href="' . $location . '/index.php?' . $query . '" id="register">' . $aTagMessage . '</a>';
+    return '<a href="' . $location . '/index.php?' . $query . '" id="' . $query . '">' . $aTagMessage . '</a>';
   }
 
   private function renderThreadLink() {
@@ -105,11 +113,15 @@ class LayoutView {
   }
 
   public function redirectToRegisterPage() {
-    header("Location: http://" . $_SERVER["HTTP_HOST"] . $_SERVER["PHP_SELF"] . "?" . $this->registerQuery);
+    header("Location: http://" . $_SERVER["HTTP_HOST"] . $_SERVER["PHP_SELF"] . "?" . $this->registerQuery . "=1");
   }
 
   public function redirectToThreadPage() {
-    header("Location: http://" . $_SERVER["HTTP_HOST"] . $_SERVER["PHP_SELF"] . "?" . $this->threadQuery);
+    header("Location: http://" . $_SERVER["HTTP_HOST"] . $_SERVER["PHP_SELF"] . "?" . $this->threadQuery . '=1');
+  }
+
+  public function redirectToCreatedThreadPage(string $title) {
+    header("Location: http://" . $_SERVER["HTTP_HOST"] . $_SERVER["PHP_SELF"] . "?" . $this->threadView->getCreatedThreadQuery() . "=1&title=" . $title);
   }
 
   public function getBrowser() {

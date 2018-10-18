@@ -7,6 +7,7 @@ class MasterController extends BaseController {
   private $registerController;
   private $tamperingController;
   private $threadController;
+  private $postController;
   private $database;
   private $tamperingFound;
   private $isLoggedIn;
@@ -20,6 +21,7 @@ class MasterController extends BaseController {
     $this->registerController = new RegisterController($this->connection);
     $this->tamperingController = new TamperingController($this->connection);
     $this->threadController = new ThreadController($this->connection);
+    $this->postController = new PostController($this->connection);
     $this->tamperingFound = false;
     $this->isLoggedIn = $this->session->isLoggedIn();
   }
@@ -61,11 +63,17 @@ class MasterController extends BaseController {
       $this->isLoggedIn = $this->session->isLoggedIn();
     } else if ($this->threadView->wantsToCreateThread()) {
       $this->threadController->createThread();
+    } else if ($this->postView->wantsToPost()) {
+      $this->postController->savePost();
     }
   }
 
   private function handleFlashMessage() {
-    if (!$this->loginView->wantsToLogin() && !$this->loginView->wantsToLogout() && !$this->registerView->wantsToRegister()) {
+    if (!$this->loginView->wantsToLogin() &&
+    !$this->loginView->wantsToLogout() &&
+    !$this->registerView->wantsToRegister() &&
+    !$this->threadView->wantsToCreateThread() &&
+    !$this->postView->wantsToPost()) {
       $this->sessionPrinter->emptyMessage();
     }
   }

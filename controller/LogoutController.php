@@ -9,6 +9,7 @@ class LogoutController extends BaseController {
 
   public function handleLogout() {
     $this->session->logout();
+    $this->session->setUsername("");
     $this->sessionPrinter->logout();
     $this->loginView->removeLoginCookies();
     $this->layoutView->redirectToLoginPage();

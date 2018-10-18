@@ -9,7 +9,7 @@ class ThreadController extends BaseController {
   
   public function createThread() {
     $title = $this->threadView->getTitle();
-    $this->threadSQL->saveThread($title);
+    $this->threadSQL->saveNewThread($title);
     $this->layoutView->redirectToThreadPage();
   }
 }

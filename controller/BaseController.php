@@ -6,6 +6,7 @@ class BaseController {
   protected $registerView;
   protected $layoutView;
   protected $threadView;
+  protected $postView;
   protected $sessionPrinter;
   protected $session;
   protected $browserSQL;
@@ -17,6 +18,7 @@ class BaseController {
     $this->registerView = new \view\RegisterView();
     $this->layoutView = new \view\LayoutView($this->loginView, $this->registerView, $connection);
     $this->threadView = new \view\ThreadView($connection);
+    $this->postView = new \view\PostView();
     $this->sessionPrinter = new \view\SessionPrinter();
     $this->session = new \view\Session();
     $this->browserSQL = new \model\BrowserSQL($connection);

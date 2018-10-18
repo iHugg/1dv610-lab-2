@@ -6,12 +6,14 @@ class Session {
   private static $loggedIn = "loggedIn";
   private static $enteredUsername = "enteredUsername";
   private static $browserName = "browser";
+  private static $username = "username";
 
   public function __construct() {
     if (!isset($_SESSION[self::$message])) {
       $_SESSION[self::$message] = "";
       $_SESSION[self::$loggedIn] = false;
       $_SESSION[self::$enteredUsername] = "";
+      $_SESSION[self::$username] = "";
       $this->setBrowserName();
     }
   }
@@ -62,6 +64,14 @@ class Session {
 
   public function isBrowserSet() {
     return isset($_SESSION[self::$browserName]);
+  }
+
+  public function getUsername() : string {
+    return $_SESSION[self::$username];
+  }
+
+  public function setUsername(string $username) {
+    $_SESSION[self::$username] = $username;
   }
 }
 ?>

@@ -8,7 +8,7 @@ class ThreadSQL {
     $this->connection = $connection;
   }
 
-  public function saveThread(string $threadTitle) : bool {
+  public function saveNewThread(string $threadTitle) : bool {
     $sql = 'INSERT INTO threads (title) VALUES ("' . $threadTitle . '")';
     return $this->connection->query($sql);
   }
@@ -24,6 +24,24 @@ class ThreadSQL {
     }
 
     return $threads;
+  }
+
+  public function getPosts(string $title) : string {
+    $sql = 'SELECT posts FROM threads WHERE title = "' . $title . '"';
+    $result = $this->connection->query($sql);
+
+    if ($result->num_rows == 1) {
+      $json = $result->fetch_assoc();
+      return $json["posts"];
+    }
+
+    return "";
+  }
+
+  public function savePosts(string $title, string $posts) {
+    $posts = addslashes($posts);
+    $sql = 'REPLACE INTO threads (title, posts) VALUES ("' . $title . '", "' . $posts . '")';
+    return $this->connection->query($sql);
   }
 }
 ?>
