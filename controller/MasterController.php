@@ -27,6 +27,7 @@ class MasterController extends BaseController {
   }
 
   public function start() {
+    echo $this->session->getMessage();
     $this->handleCookieTampering();
     $this->handleSessionTheft();
     $this->handleAction();
@@ -65,6 +66,8 @@ class MasterController extends BaseController {
       $this->threadController->createThread();
     } else if ($this->postView->wantsToPost()) {
       $this->postController->savePost();
+    } else if ($this->threadView->wantsToDeletePost()) {
+      $this->postController->deletePost();
     }
   }
 
@@ -73,7 +76,8 @@ class MasterController extends BaseController {
     !$this->loginView->wantsToLogout() &&
     !$this->registerView->wantsToRegister() &&
     !$this->threadView->wantsToCreateThread() &&
-    !$this->postView->wantsToPost()) {
+    !$this->postView->wantsToPost() &&
+    !$this->threadView->wantsToDeletePost()) {
       $this->sessionPrinter->emptyMessage();
     }
   }

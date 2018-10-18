@@ -8,6 +8,8 @@ class ThreadView {
   private static $createThreadValue = "Create Thread";
   private static $createdThreadQuery = "user-created-thread";
   private static $createPostQuery = "create-post";
+  private static $deletePost = "ThreadView::RemovePost";
+  private static $postIdName = "ThreadView::PostId";
   private $threadSQL;
   private $session;
   private $createThreadQuery;
@@ -95,10 +97,14 @@ class ThreadView {
 
       foreach ($posts as $key => $post) {
         $postHtml .= '
-        <fieldset>
-          <legend>' . $post["author"] . '</legend>
-          <p>' . $post["post"] . '</p>
-        </fieldset>
+        <form method="post">
+          <fieldset>
+            <legend>' . $post["author"] . '</legend>
+            <input type="hidden" id="' . self::$postIdName . '" name="' . self::$postIdName . '" value="' . $post["id"] . '"/>
+            <p>' . $post["post"] . '</p>
+            <input type="submit" name="' . self::$deletePost . '" value="Delete post">
+          </fieldset>
+        </form>
         ';
       }
     }
@@ -116,6 +122,14 @@ class ThreadView {
 
   public function wantsToCreateThread() : bool {
     return isset($_POST[self::$threadTitle]);
+  }
+
+  public function wantsToDeletePost() : bool {
+    return isset($_POST[self::$deletePost]);
+  }
+
+  public function getPostId() : int {
+    return $_POST[self::$postIdName];
   }
 
   public function getTitle() : string {

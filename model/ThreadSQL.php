@@ -8,8 +8,8 @@ class ThreadSQL {
     $this->connection = $connection;
   }
 
-  public function saveNewThread(string $threadTitle) : bool {
-    $sql = 'INSERT INTO threads (title) VALUES ("' . $threadTitle . '")';
+  public function saveNewThread(string $threadTitle, string $threadAuthor) : bool {
+    $sql = 'INSERT INTO threads (title, threadAuthor) VALUES ("' . $threadTitle . '", "' . $threadAuthor . '")';
     return $this->connection->query($sql);
   }
 
@@ -40,7 +40,7 @@ class ThreadSQL {
 
   public function savePosts(string $title, string $posts) {
     $posts = addslashes($posts);
-    $sql = 'REPLACE INTO threads (title, posts) VALUES ("' . $title . '", "' . $posts . '")';
+    $sql = 'UPDATE threads SET posts="' . $posts . '" WHERE title="' . $title . '"';
     return $this->connection->query($sql);
   }
 }
