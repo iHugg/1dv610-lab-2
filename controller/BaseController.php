@@ -18,7 +18,7 @@ class BaseController {
     $this->registerView = new \view\RegisterView();
     $this->layoutView = new \view\LayoutView($this->loginView, $this->registerView, $connection);
     $this->threadView = new \view\ThreadView($connection);
-    $this->postView = new \view\PostView();
+    $this->postView = new \view\PostView($connection);
     $this->sessionPrinter = new \view\SessionPrinter();
     $this->session = new \view\Session();
     $this->browserSQL = new \model\BrowserSQL($connection);

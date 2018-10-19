@@ -7,27 +7,25 @@ class PostController extends BaseController {
   }
 
   public function savePost() {
-    $title = $this->getThreadTitle();
-    $thread = new \model\Thread($title);
-    $this->addPosts($thread);
+    $threadId = $this->getThreadId();
+    $thread = $this->threadSQL->getThread($threadId);
     $post = $this->postView->getPost();
     $thread->addPost($post, $this->session->getUsername());
-    $this->threadSQL->savePosts($title, $thread->getJsonPosts());
-    $this->layoutView->redirectToCreatedThreadPage($title);
+    $this->threadSQL->savePosts($threadId, $thread->getJsonPosts());
+    $this->layoutView->redirectToCreatedThreadPage($threadId);
   }
 
   public function deletePost() {
     $postId = $this->threadView->getPostId();
-    $title = $this->getThreadTitle();
-    $thread = new \model\Thread($title);
-    $this->addPosts($thread);
+    $threadId = $this->threadView->getIdFromURL();
+    $thread = $this->threadSQL->getThread($threadId);
     $thread->deletePost($postId);
-    $this->threadSQL->savePosts($title, $thread->getJsonPosts());
-    $this->layoutView->redirectToCreatedThreadPage($title);
+    $this->threadSQL->savePosts($threadId, $thread->getJsonPosts());
+    $this->layoutView->redirectToCreatedThreadPage($threadId);
   }
 
-  private function getThreadTitle() : string {
-    return $this->postView->getTitle();
+  private function getThreadId() : int {
+    return $this->postView->getIdFromURL();
   }
 
   private function addPosts(\model\Thread $thread) {

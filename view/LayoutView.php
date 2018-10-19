@@ -15,7 +15,7 @@ class LayoutView {
     $this->dateTimeView = new DateTimeView();
     $this->registerView = $registerView;
     $this->threadView = new ThreadView($connection);
-    $this->postView = new PostView();
+    $this->postView = new PostView($connection);
     $this->connection = $connection;
     $this->registerQuery = "register";
     $this->threadQuery = "thread";
@@ -68,9 +68,9 @@ class LayoutView {
      } else if (isset($result[$this->threadView->getCreateThreadQuery()])) {
       return $this->threadView->generateCreateThreadHTML();
      } else if (isset($result[$this->threadView->getCreatedThreadQuery()])) {
-      return $this->threadView->generateUserCreatedThreadHTML($result["title"]);
+      return $this->threadView->generateUserCreatedThreadHTML($result["id"]);
      } else if (isset($result[$this->threadView->getCreatePostQuery()])) {
-      return $this->postView->generatePostHTML($result["title"]);
+      return $this->postView->generatePostHTML($result["id"]);
      }
       else {
       return $this->loginView->response($isLoggedIn);
@@ -120,8 +120,8 @@ class LayoutView {
     header("Location: http://" . $_SERVER["HTTP_HOST"] . $_SERVER["PHP_SELF"] . "?" . $this->threadQuery . '=1');
   }
 
-  public function redirectToCreatedThreadPage(string $title) {
-    header("Location: http://" . $_SERVER["HTTP_HOST"] . $_SERVER["PHP_SELF"] . "?" . $this->threadView->getCreatedThreadQuery() . "=1&title=" . $title);
+  public function redirectToCreatedThreadPage(int $id) {
+    header("Location: http://" . $_SERVER["HTTP_HOST"] . $_SERVER["PHP_SELF"] . "?" . $this->threadView->getCreatedThreadQuery() . "=1&id=" . $id);
   }
 
   public function getBrowser() {

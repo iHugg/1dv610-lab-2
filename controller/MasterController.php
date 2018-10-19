@@ -27,7 +27,6 @@ class MasterController extends BaseController {
   }
 
   public function start() {
-    echo $this->session->getMessage();
     $this->handleCookieTampering();
     $this->handleSessionTheft();
     $this->handleAction();
@@ -68,6 +67,8 @@ class MasterController extends BaseController {
       $this->postController->savePost();
     } else if ($this->threadView->wantsToDeletePost()) {
       $this->postController->deletePost();
+    } else if ($this->threadView->wantsToDeleteThread()) {
+      $this->threadController->deleteThread();
     }
   }
 

@@ -4,9 +4,13 @@ namespace model;
 class Thread {
   private $title;
   private $posts;
+  private $author;
+  private $id;
 
-  public function __construct(string $title) {
+  public function __construct(string $title, string $author, int $id) {
     $this->title = $title;
+    $this->id = $id;
+    $this->author = $author;
     $this->posts = array();
   }
 
@@ -14,10 +18,18 @@ class Thread {
     return $this->title;
   }
 
+  public function getAuthor() {
+    return $this->author;
+  }
+
+  public function getId() {
+    return $this->id;
+  }
+
   public function addPostsFromDatabase(string $json) {
     $posts = json_decode($json, true);
 
-    foreach($posts as $key => $post) {
+    foreach($posts as $post) {
       $this->posts[] = new Post($post["post"], $post["author"], $post["id"]);
     }
   }
@@ -31,8 +43,8 @@ class Thread {
     $max = -1;
 
     foreach($this->posts as $post) {
-      if ($post->id > $max) {
-        $max = $post->id;
+      if ($post->getId() > $max) {
+        $max = $post->getId();
       }
     }
 
@@ -57,7 +69,7 @@ class Thread {
   private function getPostToDeleteIndex($id) : int {
     $index = -1;
     for ($i = 0; $i < count($this->posts); $i++) {
-      if ($this->posts[$i]->id == $id) {
+      if ($this->posts[$i]->getId() == $id) {
         $index = $i;
         break;
       }

@@ -9,7 +9,16 @@ class ThreadController extends BaseController {
   
   public function createThread() {
     $title = $this->threadView->getTitle();
-    $this->threadSQL->saveNewThread($title, $this->session->getUsername());
+    $maxId = $this->threadSQL->getMaxId();
+    $author = $this->session->getUsername();
+    $thread = new \model\Thread($title, $author, ++$maxId);
+    $this->threadSQL->saveNewThread($thread);
+    $this->layoutView->redirectToThreadPage();
+  }
+
+  public function deleteThread() {
+    $threadId = $this->threadView->getThreadIdToDelete();
+    $this->threadSQL->deleteThread($threadId);
     $this->layoutView->redirectToThreadPage();
   }
 }

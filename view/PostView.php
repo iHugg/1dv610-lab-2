@@ -4,8 +4,14 @@ namespace view;
 class PostView {
   private static $post = "PostView::Post";
   private static $createPost = "PostView::CreatePost";
+  private $threadSQL;
 
-  public function generatePostHTML(string $title) : string {
+  public function __construct(\mysqli $connection) {
+    $this->threadSQL = new \model\ThreadSQL($connection);
+  }
+
+  public function generatePostHTML(int $id) : string {
+    $title = $this->threadSQL->getTitle($id);
     return '
     <h2>' . $title . '</h2>
     <form method="post">
@@ -22,14 +28,14 @@ class PostView {
     return isset($_POST[self::$createPost]);
   }
 
-  public function getTitle() : string {
+  public function getIdFromURL() : int {
     parse_str($_SERVER["QUERY_STRING"], $result);
     
-    if (isset($result["title"])) {
-      return $result["title"];
+    if (isset($result["id"])) {
+      return $result["id"];
     }
 
-    return "";
+    return -1;
   }
 
   public function getPost() : string {

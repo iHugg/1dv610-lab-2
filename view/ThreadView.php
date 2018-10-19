@@ -8,7 +8,9 @@ class ThreadView {
   private static $createThreadValue = "Create Thread";
   private static $createdThreadQuery = "user-created-thread";
   private static $createPostQuery = "create-post";
-  private static $deletePost = "ThreadView::RemovePost";
+  private static $deletePost = "ThreadView::DeletePost";
+  private static $deleteThread = "ThreadView::DeleteThread";
+  private static $threadIdName = "ThreadView::ThreadId";
   private static $postIdName = "ThreadView::PostId";
   private $threadSQL;
   private $session;
@@ -60,7 +62,8 @@ class ThreadView {
   }
 
   private function generateThreadTitlesHTML() {
-    $threads = $this->getSavedTitles();
+    $threads = $this->threadSQL->getThreads();
+    $submitHtml = '<input type="submit" name="' . self::$deleteThread . '" value="Delete post">';
     $html = '';
 
     if (count($threads) > 0) {
@@ -69,14 +72,36 @@ class ThreadView {
       <legend>Existing threads</legend>
       ';
       foreach($threads as $thread) {
-        $html .= '<a href="' . $this->getLocation() . '/index.php?' . self::$createdThreadQuery . '=1&title=' . $thread . '" style="margin:10px;">' . $thread . '</a>';
+        $html .= '
+        <fieldset>
+          <legend>Created by: ' . $thread->getAuthor() . '</legend>
+          <a href="' . $this->getLocation() . '/index.php?' . self::$createdThreadQuery . '=1&id=' . $thread->getId() . '" style="margin:10px;">' . $thread->getTitle() . '</a>
+          ' . $this->generateDeleteThreadHTML($thread) . '
+        </fieldset>
+        ';
       }
     }
     return $html;
   }
 
-  public function generateUserCreatedThreadHTML(string $title) : string {
-    $createPostHtml = '<a href="' . $this->getLocation() . '/index.php?' . self::$createPostQuery . '=1&title=' . $title . '">Create post</a>';
+  private function generateDeleteThreadHTML(\model\Thread $thread) {
+    $submit = '';
+
+    if ($thread->getAuthor() == $this->session->getUsername() || $this->session->getUsername() == "Admin") {
+      $submit = '
+      <form method="post">
+        <input type="hidden" id="' . self::$threadIdName . '" name="' . self::$threadIdName . '" value="' . $thread->getId() . '" />
+        <input type="submit" name="' . self::$deleteThread . '" value="Delete thread">
+      </form>
+      ';
+    }
+
+    return $submit;
+  }
+
+  public function generateUserCreatedThreadHTML(int $id) : string {
+    $title = $this->threadSQL->getTitle($id);
+    $createPostHtml = '<a href="' . $this->getLocation() . '/index.php?' . self::$createPostQuery . '=1&id=' . $id . '">Create post</a>';
 
     if (!$this->session->isLoggedIn()) {
       $createPostHtml = "";
@@ -89,22 +114,19 @@ class ThreadView {
   }
 
   private function getPosts() : string {
-    $posts = $this->threadSQL->getPosts($this->getTitleFromURL());
+    $thread = $this->threadSQL->getThread($this->getIdFromURL());
     $postHtml = "";
     $submitHtml = '<input type="submit" name="' . self::$deletePost . '" value="Delete post">';
     $submit = "";
-    $threadAuthor = $this->threadSQL->getThreadAuthor($this->getTitleFromURL());
 
-    if ($posts != "") {
-      $posts = json_decode($posts, true);
-
-      foreach ($posts as $key => $post) {
-        if ((!$this->session->isLoggedIn() || $this->session->getUsername() != $post["author"]) && $this->session->getUsername() != "Admin" &&
-        $this->session->getUsername() != $threadAuthor) {
+    if ($thread != null) {
+      foreach ($thread->getPosts() as $key => $post) {
+        if ((!$this->session->isLoggedIn() || $this->session->getUsername() != $post->getAuthor()) && $this->session->getUsername() != "Admin" &&
+        $this->session->getUsername() != $thread->getAuthor()) {
           $submit = "";
         } else {
           $submit = '
-          <input type="hidden" id="' . self::$postIdName . '" name="' . self::$postIdName . '" value="' . $post["id"] . '"/>
+          <input type="hidden" id="' . self::$postIdName . '" name="' . self::$postIdName . '" value="' . $post->getId() . '"/>
           ' . $submitHtml . '
           ';
         }
@@ -112,8 +134,8 @@ class ThreadView {
         $postHtml .= '
         <form method="post">
           <fieldset>
-            <legend>' . $post["author"] . '</legend>
-            <p>' . $post["post"] . '</p>
+            <legend>' . $post->getAuthor() . '</legend>
+            <p>' . $post->getPost() . '</p>
             ' . $submit . '
           </fieldset>
         </form>
@@ -136,8 +158,16 @@ class ThreadView {
     return isset($_POST[self::$threadTitle]);
   }
 
+  public function wantsToDeleteThread() : bool {
+    return isset($_POST[self::$deleteThread]);
+  }
+
   public function wantsToDeletePost() : bool {
     return isset($_POST[self::$deletePost]);
+  }
+
+  public function getThreadIdToDelete() : int {
+    return $_POST[self::$threadIdName];
   }
 
   public function getPostId() : int {
@@ -148,14 +178,14 @@ class ThreadView {
     return $_POST[self::$threadTitle];
   }
 
-  private function getTitleFromURL() : string {
+  public function getIdFromURL() : int {
     parse_str($_SERVER["QUERY_STRING"], $result);
     
-    if (isset($result["title"])) {
-      return $result["title"];
+    if (isset($result["id"])) {
+      return $result["id"];
     }
 
-    return "";
+    return -1;
   }
 
   public function getCreatedThreadQuery() : string {
@@ -164,10 +194,6 @@ class ThreadView {
 
   public function getCreatePostQuery() : string {
     return static::$createPostQuery;
-  }
-
-  private function getSavedTitles() {
-    return $this->threadSQL->getThreads();
   }
 }
 ?>
