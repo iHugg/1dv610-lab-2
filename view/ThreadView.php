@@ -135,7 +135,7 @@ class ThreadView {
         <form method="post">
           <fieldset>
             <legend>' . $post->getAuthor() . '</legend>
-            <p>' . $post->getPost() . '</p>
+            <p>' . nl2br($post->getPost()) . '</p>
             ' . $submit . '
           </fieldset>
         </form>
