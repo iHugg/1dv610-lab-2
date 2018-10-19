@@ -11,7 +11,7 @@ class ThreadController extends BaseController {
     $title = $this->threadView->getTitle();
     $maxId = $this->threadSQL->getMaxId();
     $author = $this->session->getUsername();
-    $thread = new \model\Thread($title, $author, ++$maxId);
+    $thread = new \model\Thread($title, $author, ++$maxId, 0);
     $this->threadSQL->saveNewThread($thread);
     $this->layoutView->redirectToThreadPage();
   }

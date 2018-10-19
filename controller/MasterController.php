@@ -78,7 +78,8 @@ class MasterController extends BaseController {
     !$this->registerView->wantsToRegister() &&
     !$this->threadView->wantsToCreateThread() &&
     !$this->postView->wantsToPost() &&
-    !$this->threadView->wantsToDeletePost()) {
+    !$this->threadView->wantsToDeletePost() &&
+    !$this->threadView->wantsToDeleteThread()) {
       $this->sessionPrinter->emptyMessage();
     }
   }

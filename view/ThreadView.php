@@ -74,7 +74,7 @@ class ThreadView {
       foreach($threads as $thread) {
         $html .= '
         <fieldset>
-          <legend>Created by: ' . $thread->getAuthor() . '</legend>
+          <legend>Created by: ' . $thread->getAuthor() . ' - Number of posts: ' . $thread->getPostCount() . '</legend>
           <a href="' . $this->getLocation() . '/index.php?' . self::$createdThreadQuery . '=1&id=' . $thread->getId() . '" style="margin:10px;">' . $thread->getTitle() . '</a>
           ' . $this->generateDeleteThreadHTML($thread) . '
         </fieldset>

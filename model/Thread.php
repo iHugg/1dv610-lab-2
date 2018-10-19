@@ -6,11 +6,13 @@ class Thread {
   private $posts;
   private $author;
   private $id;
+  private $postCount;
 
-  public function __construct(string $title, string $author, int $id) {
+  public function __construct(string $title, string $author, int $id, int $postCount) {
     $this->title = $title;
     $this->id = $id;
     $this->author = $author;
+    $this->postCount = $postCount;
     $this->posts = array();
   }
 
@@ -18,12 +20,16 @@ class Thread {
     return $this->title;
   }
 
-  public function getAuthor() {
+  public function getAuthor() : string {
     return $this->author;
   }
 
-  public function getId() {
+  public function getId() : int {
     return $this->id;
+  }
+
+  public function getPostCount() : int {
+    return $this->postCount;
   }
 
   public function addPostsFromDatabase(string $json) {

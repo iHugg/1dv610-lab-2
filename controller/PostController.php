@@ -11,7 +11,7 @@ class PostController extends BaseController {
     $thread = $this->threadSQL->getThread($threadId);
     $post = $this->postView->getPost();
     $thread->addPost($post, $this->session->getUsername());
-    $this->threadSQL->savePosts($threadId, $thread->getJsonPosts());
+    $this->threadSQL->savePosts($thread);
     $this->layoutView->redirectToCreatedThreadPage($threadId);
   }
 

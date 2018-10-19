@@ -15,20 +15,21 @@ class ThreadSQL {
 
   public function getThreads() : array {
     $threads = array();
-    $sql = 'SELECT title, threadAuthor, threadId FROM threads';
+    $sql = 'SELECT title, threadAuthor, threadId, postCount FROM threads';
     $result = $this->connection->query($sql);
     if ($result->num_rows > 0) {
       while ($thread = $result->fetch_assoc()) {
-        $threads[] = new Thread($thread["title"], $thread["threadAuthor"], $thread["threadId"]);
+        $threads[] = new Thread($thread["title"], $thread["threadAuthor"], $thread["threadId"], $thread["postCount"]);
       }
     }
 
     return $threads;
   }
 
-  public function savePosts(int $id, string $posts) {
-    $posts = addslashes($posts);
-    $sql = 'UPDATE threads SET posts="' . $posts . '" WHERE threadId="' . $id . '"';
+  public function savePosts(Thread $thread) {
+    $jsonPosts = $thread->getJsonPosts();
+    $jsonPosts = addslashes($jsonPosts);
+    $sql = 'UPDATE threads SET posts="' . $jsonPosts . '", postCount = "' . count($thread->getPosts()) . '" WHERE threadId="' . $thread->getId() . '"';
     return $this->connection->query($sql);
   }
 
@@ -40,6 +41,10 @@ class ThreadSQL {
     if ($result->num_rows == 1) {
       $result = $result->fetch_assoc();
       $maxId = $result["maxId"];
+    }
+
+    if ($maxId == null) {
+      $maxId = -1;
     }
 
     return $maxId;
@@ -62,13 +67,13 @@ class ThreadSQL {
   }
 
   public function getThread(int $id) : Thread {
-    $sql = 'SELECT title, threadAuthor, posts FROM threads WHERE threadId="' . $id . '"';
+    $sql = 'SELECT title, threadAuthor, postCount, posts FROM threads WHERE threadId="' . $id . '"';
     $result = $this->connection->query($sql);
     $thread = null;
 
     if ($result->num_rows == 1) {
       $result = $result->fetch_assoc();
-      $thread = new Thread($result["title"], $result["threadAuthor"], $id);
+      $thread = new Thread($result["title"], $result["threadAuthor"], $id, $result["postCount"]);
       if ($result["posts"] != null) {
         $thread->addPostsFromDatabase($result["posts"]);
       }
