@@ -83,13 +83,49 @@ class SessionPrinter {
 
   public function setRegisterEnteredUsername() {
     $enteredUsername = $this->registerView->getUsername();
-    $username = $this->removeTagsAndInvalidCharacters($enteredUsername);
+    $username = removeTagsAndInvalidCharacters($enteredUsername);
     $this->session->setEnteredUsername($username);
   }
 
-  private function removeTagsAndInvalidCharacters(string $username) : string {
-    $username = strip_tags($username);
-    return preg_replace('/[^A-Za-z0-9\-]/', '', $username);
+  public function titleIsTooShort($thread) {
+    $this->session->setMessage("The title is too short, at least " . $thread->getTitleMinChar() . " characters are needed.");
+  }
+
+  public function titleIsTooLong($thread) {
+    $this->session->setMessage("The title is too long, use a maximum of " . $thread->getTitleMaxChar() . " characters.");
+  }
+
+  public function titleContainsInvalidChar() {
+    $this->session->setMessage("Thread contains invalid character.");
+  }
+
+  public function setThreadTitle(\model\Thread $thread) {
+    $this->session->setThreadTitle($thread->getTitle());
+  }
+
+  public function postIsEmpty() {
+    $this->session->setMessage("Post is empty, please enter something.");
+  }
+
+  public function postContainsInvalidChar() {
+    $this->session->setMessage("Post contains invalid character.");
+  }
+
+  public function setPost(\model\Post $post) {
+    $this->session->setPost($post->getPost());
+  }
+
+  public function emptyTitle() {
+    $this->session->setThreadTitle("");
+  }
+
+  public function emptyPost() {
+    $this->session->setPost("");
+  }
+
+  public function removeTagsAndInvalidCharacters(string $data) : string {
+    $data = strip_tags($data);
+    return preg_replace('/[^A-Za-z0-9\-?!#$ ]/', '', $data);
   }
 }
 ?>

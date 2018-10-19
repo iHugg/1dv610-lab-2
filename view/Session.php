@@ -7,6 +7,8 @@ class Session {
   private static $enteredUsername = "enteredUsername";
   private static $browserName = "browser";
   private static $username = "username";
+  private static $threadTitle = "threadTitle";
+  private static $post = "post";
 
   public function __construct() {
     if (!isset($_SESSION[self::$message])) {
@@ -14,6 +16,8 @@ class Session {
       $_SESSION[self::$loggedIn] = false;
       $_SESSION[self::$enteredUsername] = "";
       $_SESSION[self::$username] = "";
+      $_SESSION[self::$threadTitle] = "";
+      $_SESSION[self::$post] = "";
       $this->setBrowserName();
     }
   }
@@ -72,6 +76,22 @@ class Session {
 
   public function setUsername(string $username) {
     $_SESSION[self::$username] = $username;
+  }
+
+  public function getThreadTitle() : string {
+    return $_SESSION[self::$threadTitle];
+  }
+
+  public function setThreadTitle(string $title) {
+    $_SESSION[self::$threadTitle] = $title;
+  }
+
+  public function getPost() : string {
+    return $_SESSION[self::$post];
+  }
+
+  public function setPost(string $post) {
+    $_SESSION[self::$post] = $post;
   }
 }
 ?>

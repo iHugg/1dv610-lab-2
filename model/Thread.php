@@ -7,6 +7,8 @@ class Thread {
   private $author;
   private $id;
   private $postCount;
+  private $titleMinChar;
+  private $titleMaxChar;
 
   public function __construct(string $title, string $author, int $id, int $postCount) {
     $this->title = $title;
@@ -14,10 +16,16 @@ class Thread {
     $this->author = $author;
     $this->postCount = $postCount;
     $this->posts = array();
+    $this->titleMinChar = 4;
+    $this->titleMaxChar = 70;
   }
 
   public function getTitle() : string {
     return $this->title;
+  }
+
+  public function setTitle(string $title) {
+    $this->title = $title;
   }
 
   public function getAuthor() : string {
@@ -40,12 +48,11 @@ class Thread {
     }
   }
 
-  public function addPost(string $post, string $author) {
-    $maxId = $this->getMaxPostId();
-    $this->posts[] = new Post($post, $author, ++$maxId);
+  public function addPost(Post $post) {
+    $this->posts[] = $post;
   }
 
-  private function getMaxPostId() : int {
+  public function getMaxPostId() : int {
     $max = -1;
 
     foreach($this->posts as $post) {
@@ -81,6 +88,26 @@ class Thread {
       }
     }
     return $index;
+  }
+
+  public function titleIsTooShort() : bool {
+    return strlen($this->title) < $this->titleMinChar;
+  }
+
+  public function titleIsTooLong() : bool {
+    return strlen($this->title) > $this->titleMaxChar;
+  }
+
+  public function titleContainsInvalidChar() : bool {
+    return preg_match('(<|>)', $this->title) === 1;
+  }
+
+  public function getTitleMinChar() : int {
+    return $this->titleMinChar;
+  }
+
+  public function getTitleMaxChar() : int {
+    return $this->titleMaxChar;
   }
 }
 ?>

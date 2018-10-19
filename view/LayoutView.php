@@ -65,16 +65,15 @@ class LayoutView {
       return $this->registerView->generateRegisterFormHTML();
      } else if (isset($result[$this->threadQuery])) {
       return $this->threadView->generateThreadHTML();
-     } else if (isset($result[$this->threadView->getCreateThreadQuery()])) {
+     } else if (isset($result[$this->threadView->getCreateThreadQuery()]) && $isLoggedIn) {
       return $this->threadView->generateCreateThreadHTML();
      } else if (isset($result[$this->threadView->getCreatedThreadQuery()])) {
       return $this->threadView->generateUserCreatedThreadHTML($result["id"]);
-     } else if (isset($result[$this->threadView->getCreatePostQuery()])) {
+     } else if (isset($result[$this->threadView->getCreatePostQuery()]) && $isLoggedIn) {
       return $this->postView->generatePostHTML($result["id"]);
      }
-      else {
-      return $this->loginView->response($isLoggedIn);
-     }
+
+    return $this->loginView->response($isLoggedIn);
   }
 
   private function getQueryString() {
@@ -122,6 +121,10 @@ class LayoutView {
 
   public function redirectToCreatedThreadPage(int $id) {
     header("Location: http://" . $_SERVER["HTTP_HOST"] . $_SERVER["PHP_SELF"] . "?" . $this->threadView->getCreatedThreadQuery() . "=1&id=" . $id);
+  }
+
+  public function redirectToSamePage() {
+    header('Location: http://' . $_SERVER["HTTP_HOST"] . $_SERVER["PHP_SELF"] . '?' . $_SERVER["QUERY_STRING"]);
   }
 
   public function getBrowser() {

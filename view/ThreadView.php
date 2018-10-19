@@ -54,7 +54,7 @@ class ThreadView {
         <legend>Create new thread - Enter thread title</legend>
         <p id="' . self::$messageId . '">' . $this->session->getMessage() . '</p>
         <label for="' . self::$threadTitle . '">Title: </label>
-        <input type="text" id="' . self::$threadTitle . '" name="' . self::$threadTitle . '" value=""/><br>
+        <input type="text" id="' . self::$threadTitle . '" name="' . self::$threadTitle . '" value="' . $this->session->getThreadTitle() . '" size="100"/><br>
         <input type="submit" name="' . self::$createThread . '" value="' . self::$createThreadValue . '" />
       </fieldset>
     </form>
@@ -91,7 +91,7 @@ class ThreadView {
       $submit = '
       <form method="post">
         <input type="hidden" id="' . self::$threadIdName . '" name="' . self::$threadIdName . '" value="' . $thread->getId() . '" />
-        <input type="submit" name="' . self::$deleteThread . '" value="Delete thread">
+        <input type="submit" name="' . self::$deleteThread . '" value="Delete thread" style="float:right;">
       </form>
       ';
     }
@@ -116,7 +116,7 @@ class ThreadView {
   private function getPosts() : string {
     $thread = $this->threadSQL->getThread($this->getIdFromURL());
     $postHtml = "";
-    $submitHtml = '<input type="submit" name="' . self::$deletePost . '" value="Delete post">';
+    $submitHtml = '<input type="submit" name="' . self::$deletePost . '" value="Delete post" style="float:right;">';
     $submit = "";
 
     if ($thread != null) {

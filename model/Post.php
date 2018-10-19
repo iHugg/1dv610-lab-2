@@ -23,5 +23,17 @@ class Post {
   public function getId() : int {
     return $this->id;
   }
+
+  public function setPost(string $post) {
+    $this->post = $post;
+  }
+
+  public function postIsEmpty() : bool {
+    return strlen($this->post) == 0;
+  }
+
+  public function postContainsInvalidChar() : bool {
+    return preg_match('(<|>)', $this->post) === 1;
+  }
 }
 ?>
