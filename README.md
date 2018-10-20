@@ -1,2 +1,2 @@
-# Login_1DV608
-Interface repository for 1DV608 assignment 2 and 4
+# Repo for both lab 2 and 3
+Repo for lab 2 and 3 in course 1dv610
