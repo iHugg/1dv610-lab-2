@@ -26,12 +26,16 @@ class ThreadSQL {
 
   public function getThreads() : array {
     $threads = array();
-    $sql = 'SELECT ' . self::$titleName . ', ' . self::$authorName . ', ' . self::$idName . ', ' . self::$postCountName . ' FROM ' . self::$tableName;
+    $sql = 'SELECT ' . self::$titleName . ', ' . self::$authorName . ', ' . self::$idName . ', ' . self::$postCountName . 
+    ' FROM ' . self::$tableName;
     $result = $this->connection->query($sql);
 
     if ($result->num_rows > 0) {
       while ($thread = $result->fetch_assoc()) {
-        $threads[] = new Thread($thread[self::$titleName], $thread[self::$authorName], $thread[self::$idName], $thread[self::$postCountName]);
+        $threads[] = new Thread($thread[self::$titleName], 
+        $thread[self::$authorName], 
+        $thread[self::$idName], 
+        $thread[self::$postCountName]);
       }
     }
 

@@ -12,7 +12,10 @@ class Database {
 
   public function __construct() {
     $this->settings = parse_ini_file("./settings.ini");
-    $this->connection = new \mysqli($this->settings["dbURL"], $this->settings["dbName"], $this->settings["dbPassword"], $this->settings["dbName"]);
+    $this->connection = new \mysqli($this->settings["dbURL"], 
+    $this->settings["dbName"], 
+    $this->settings["dbPassword"], 
+    $this->settings["dbName"]);
   }
 
   /**

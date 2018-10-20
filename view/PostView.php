@@ -77,8 +77,8 @@ class PostView extends BaseView {
     <input type="submit" name="' . self::$deletePost . '" value="Delete post" style="float:right;">
     ';
 
-    if ((!$this->session->isLoggedIn() || $this->session->getUsername() != $post->getAuthor()) && $this->session->getUsername() != "Admin" &&
-    $this->session->getUsername() != $thread->getAuthor()) {
+    if ((!$this->session->isLoggedIn() || $this->session->getUsername() != $post->getAuthor()) && 
+    $this->session->getUsername() != "Admin" && $this->session->getUsername() != $thread->getAuthor()) {
       $submit = "";
     }
 

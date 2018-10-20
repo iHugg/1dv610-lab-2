@@ -55,8 +55,8 @@ class ThreadView extends BaseView {
         $html .= '
         <fieldset>
           <legend>Created by: ' . $thread->getAuthor() . ' - Number of posts: ' . $thread->getPostCount() . '</legend>
-          <a href="' . $this->getLocation() . '/index.php?' . self::$userCreatedThreadQuery . '=1&' . self::$idQuery . '=' . $thread->getId() .
-          '" style="margin:10px;">' . $thread->getTitle() . '</a>
+          <a href="' . $this->getLocation() . '/index.php?' . self::$userCreatedThreadQuery . '=1&' . self::$idQuery . 
+          '=' . $thread->getId() . '" style="margin:10px;">' . $thread->getTitle() . '</a>
           ' . $this->generateDeleteThreadHTML($thread) . '
         </fieldset>
         ';
@@ -88,7 +88,8 @@ class ThreadView extends BaseView {
         <legend>Create new thread - Enter thread title</legend>
         <p id="' . self::$messageId . '">' . $this->session->getMessage() . '</p>
         <label for="' . self::$threadTitle . '">Title: </label>
-        <input type="text" id="' . self::$threadTitle . '" name="' . self::$threadTitle . '" value="' . $this->session->getThreadTitle() . '" size="100"/><br>
+        <input type="text" id="' . self::$threadTitle . '" name="' . self::$threadTitle . '" value="' . 
+        $this->session->getThreadTitle() . '" size="100"/><br>
         <input type="submit" name="' . self::$createThread . '" value="' . self::$createThreadValue . '" />
       </fieldset>
     </form>
@@ -97,7 +98,8 @@ class ThreadView extends BaseView {
 
   public function generateUserCreatedThreadHTML(int $id) : string {
     $title = $this->threadSQL->getTitle($id);
-    $createPostHtml = '<a href="' . $this->getLocation() . '/index.php?' . self::$createPostQuery . '=1&' . self::$idQuery . '=' . $id . '">Create post</a>';
+    $createPostHtml = '<a href="' . $this->getLocation() . '/index.php?' . self::$createPostQuery . 
+    '=1&' . self::$idQuery . '=' . $id . '">Create post</a>';
     $thread = null;
     try {
       $thread = $this->threadSQL->getThread($id);
