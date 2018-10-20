@@ -1,6 +1,9 @@
 <?php
 namespace view;
 
+/**
+ * Handles the html for the login/logout page.
+ */
 class LoginView {
 	private static $login = 'LoginView::Login';
 	private static $logout = 'LoginView::Logout';
@@ -109,12 +112,16 @@ class LoginView {
     setcookie(self::$cookiePassword, $hashedPassword, time() + (24 * (60 + 60)));
   }
 
-  public function loginCookiesExist() : bool {
-    return (isset($_COOKIE[self::$cookieName]) && isset($_COOKIE[self::$cookiePassword]));
+  public function getCookieName() : string {
+    return $_COOKIE[self::$cookieName];
   }
 
-  public function getCookieUser() : \model\User {
-    return new \model\User($_COOKIE[self::$cookieName], $_COOKIE[self::$cookiePassword]);
+  public function getCookiePassword() : string {
+    return $_COOKIE[self::$cookiePassword];
+  }
+
+  public function loginCookiesExist() : bool {
+    return (isset($_COOKIE[self::$cookieName]) && isset($_COOKIE[self::$cookiePassword]));
   }
 
   public function removeLoginCookies() {

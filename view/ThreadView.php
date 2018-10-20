@@ -1,13 +1,18 @@
 <?php
 namespace view;
 
+/**
+ * Handles the html for the thread related pages.
+ * It was hard to come up with names for all the methods.
+ * They all sound somewhat similar.
+ */
 class ThreadView extends BaseView {
   private static $messageId = "ThreadView::Message";
   private static $threadTitle = "ThreadView::Title";
   private static $createThread = "ThreadView::CreateThread";
   private static $deleteThread = "ThreadView::DeleteThread";
   private static $threadIdName = "ThreadView::ThreadId";
-  private static $createThreadValue = "Create Thread";
+  private static $createThreadValue = "Create thread";
 
   private $postView;
 

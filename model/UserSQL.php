@@ -1,6 +1,9 @@
 <?php
 namespace model;
 
+/**
+ * Handles the database querying regarding users.
+ */
 class UserSQL {
   private static $tableName = "users";
   private static $username = "username";
@@ -10,6 +13,7 @@ class UserSQL {
   public function __construct(\mysqli $connection) {
     $this->connection = $connection;
   }
+
   public function userExists(string $username) : bool {
     $result = $this->connection->query('SELECT ' . self::$username . ' FROM ' . self::$tableName . ' WHERE ' . self::$username . '="' . $username . '"');
     return $result->num_rows > 0;
@@ -29,6 +33,7 @@ class UserSQL {
   public function addUserToDatabase(string $username, string $password) : bool {
     $sql = 'INSERT INTO ' . self::$tableName . ' (' . self::$username . ', ' . self::$password . ') 
     VALUES ("' . $username . '", "' . password_hash($password, PASSWORD_BCRYPT) . '")';
+
     return $this->connection->query($sql);
   }
 }

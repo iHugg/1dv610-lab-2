@@ -1,6 +1,9 @@
 <?php
 namespace view;
 
+/**
+ * Handles the html for the register user page.
+ */
 class RegisterView {
   private static $name = "RegisterView::UserName";
   private static $password = "RegisterView::Password";

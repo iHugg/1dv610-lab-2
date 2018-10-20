@@ -1,6 +1,9 @@
 <?php
 namespace controller;
 
+/**
+ * Handles the high end code related to threads.
+ */
 class ThreadController extends BaseController {
 
   public function __construct(\mysqli $connection) {
@@ -8,10 +11,7 @@ class ThreadController extends BaseController {
   }
   
   public function createThread() {
-    $title = $this->threadView->getTitle();
-    $maxId = $this->threadSQL->getMaxId();
-    $author = $this->session->getUsername();
-    $thread = new \model\Thread($title, $author, ++$maxId, 0);
+    $thread = $this->getThread();
 
     if (!$this->titleHasErrors($thread)) {
       $this->threadSQL->saveNewThread($thread);
@@ -23,6 +23,13 @@ class ThreadController extends BaseController {
     }
   }
 
+  private function getThread() : \model\Thread {
+    $title = $this->threadView->getTitle();
+    $maxId = $this->threadSQL->getMaxId();
+    $author = $this->session->getUsername();
+    return new \model\Thread($title, $author, ++$maxId, 0);
+  }
+
   public function deleteThread() {
     $threadId = $this->threadView->getThreadIdToDelete();
     $this->threadSQL->deleteThread($threadId);
@@ -31,6 +38,7 @@ class ThreadController extends BaseController {
 
   private function titleHasErrors(\model\Thread $thread) : bool {
     $errorFound = false;
+
     if ($thread->titleIsTooShort()) {
       $this->sessionPrinter->titleIsTooShort($thread);
       $errorFound = true;

@@ -38,7 +38,7 @@ class User {
     return $this->password == "";
   }
 
-  public function HashedPasswordMatch(string $hashedPassword) : bool {
+  public function hashedPasswordMatch(string $hashedPassword) : bool {
     return password_verify($this->password, $hashedPassword);
   }
 

@@ -1,6 +1,10 @@
 <?php
 namespace controller;
 
+/**
+ * This class handles most of the high level calls,
+ * passing along to expert controllers.
+ */
 class MasterController extends BaseController {
   private $loginController;
   private $logoutController;
@@ -35,6 +39,10 @@ class MasterController extends BaseController {
     $this->handleFlashMessage();
   }
 
+  /**
+   * Checks if cookies have been tampered with.
+   * If true then print error message, log the user out and remove the cookies.
+   */
   private function handleCookieTampering() {
     if ($this->loginView->loginCookiesExist() && $this->tamperingController->hasCookieBeenTamperedWith()) {
       $this->sessionPrinter->cookieError();
@@ -44,6 +52,10 @@ class MasterController extends BaseController {
     }
   }
 
+  /**
+   * Checks if the session has been stolen.
+   * If true logout the thieving user.
+   */
   private function handleSessionTheft() {
     if ($this->tamperingController->hasSessionBeenStolen()) {
       $this->tamperingFound = true;
@@ -51,6 +63,11 @@ class MasterController extends BaseController {
     }
   }
 
+  /**
+   * This method can probably be done in a nicer way.
+   * It checks which action the user wants to do.
+   * Depending on the action it sends it off to methods handling that action.
+   */
   private function handleAction() {
     if ($this->loginView->wantsToLogin() && !$this->session->isLoggedIn()) {
       $this->loginController->handleLogin();
@@ -72,6 +89,10 @@ class MasterController extends BaseController {
     }
   }
 
+  /**
+   * Removes the flash message if no action was taken.
+   * E.g. on a page reload.
+   */
   private function handleFlashMessage() {
     if (!$this->loginView->wantsToLogin() &&
     !$this->loginView->wantsToLogout() &&

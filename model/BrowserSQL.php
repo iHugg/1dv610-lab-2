@@ -1,6 +1,9 @@
 <?php
 namespace model;
 
+/**
+ * Handles the database queries for the browser table.
+ */
 class BrowserSQL {
   private static $tableName = "browsers";
   private static $browserName = "browserName";

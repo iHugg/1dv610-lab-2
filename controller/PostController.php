@@ -1,6 +1,9 @@
 <?php
 namespace controller;
 
+/**
+ * Handles everything regarding posts.
+ */
 class PostController extends BaseController {
   public function __construct(\mysqli $connection) {
     parent::__construct($connection);
@@ -8,10 +11,8 @@ class PostController extends BaseController {
 
   public function savePost() {
     $threadId = $this->getThreadId();
-    $thread = $this->threadSQL->getThread($threadId);
-    $postText = $this->postView->getPost();
-    $postMaxId = $thread->getMaxPostId();
-    $post = new \model\Post($postText, $this->session->getUsername(), ++$postMaxId);
+    $thread = $this->getThread($threadId);
+    $post = $this->getPost($thread);
 
     if (!$this->postHasErrors($post)) {
       $thread->addPost($post);
@@ -24,10 +25,20 @@ class PostController extends BaseController {
     }
   }
 
+  private function getThread(int $threadId) : \model\Thread {
+    return $this->threadSQL->getThread($threadId);
+  }
+
+  private function getPost(\model\Thread $thread) : \model\Post {
+    $postText = $this->postView->getPost();
+    $postMaxId = $thread->getMaxPostId();
+    return new \model\Post($postText, $this->session->getUsername(), ++$postMaxId);
+  }
+
   public function deletePost() {
     $postId = $this->postView->getPostId();
-    $threadId = $this->threadView->getIdFromURL();
-    $thread = $this->threadSQL->getThread($threadId);
+    $threadId = $this->getThreadId();
+    $thread = $this->getThread($threadId);
     $thread->deletePost($postId);
     $this->threadSQL->savePosts($thread);
     $this->layoutView->redirectToCreatedThreadPage($threadId);

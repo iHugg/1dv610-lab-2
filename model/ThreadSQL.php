@@ -1,6 +1,9 @@
 <?php
 namespace model;
 
+/**
+ * Handles the database quering regarding threads.
+ */
 class ThreadSQL {
   private static $tableName = "threads";
   private static $titleName = "title";
@@ -17,6 +20,7 @@ class ThreadSQL {
   public function saveNewThread(Thread $thread) : bool {
     $sql = 'INSERT INTO ' . self::$tableName . ' (' . self::$titleName . ', ' . self::$authorName . ', ' . self::$idName . ') 
     VALUES ("' . $thread->getTitle() . '", "' . $thread->getAuthor() . '", "' . $thread->getId() . '")';
+
     return $this->connection->query($sql);
   }
 
@@ -24,6 +28,7 @@ class ThreadSQL {
     $threads = array();
     $sql = 'SELECT ' . self::$titleName . ', ' . self::$authorName . ', ' . self::$idName . ', ' . self::$postCountName . ' FROM ' . self::$tableName;
     $result = $this->connection->query($sql);
+
     if ($result->num_rows > 0) {
       while ($thread = $result->fetch_assoc()) {
         $threads[] = new Thread($thread[self::$titleName], $thread[self::$authorName], $thread[self::$idName], $thread[self::$postCountName]);
@@ -35,9 +40,10 @@ class ThreadSQL {
 
   public function savePosts(Thread $thread) {
     $jsonPosts = $thread->getJsonPosts();
-    $jsonPosts = addslashes($jsonPosts);
+    $jsonPosts = addslashes($jsonPosts);  //  Need to add slashes or the database won't recognize the string.
     $sql = 'UPDATE ' . self::$tableName . ' SET ' . self::$postsName . '="' . $jsonPosts . '", 
     ' . self::$postCountName . '="' . count($thread->getPosts()) . '" WHERE ' . self::$idName . '="' . $thread->getId() . '"';
+
     return $this->connection->query($sql);
   }
 

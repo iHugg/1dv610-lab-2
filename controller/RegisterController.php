@@ -1,6 +1,9 @@
 <?php
 namespace controller;
 
+/**
+ * Handles the registering of users.
+ */
 class RegisterController extends BaseController {
 
   public function __construct(\mysqli $connection) {
@@ -8,19 +11,24 @@ class RegisterController extends BaseController {
   }
 
   public function handleRegister() {
-    if (!$this->checkIfCredentialsAreWrong()) {
-      $this->registerUser();
+    $user = $this->getUser();
+
+    if (!$this->checkIfCredentialsAreWrong($user)) {
+      $this->registerUser($user);
       $this->layoutView->redirectToLoginPage();
     } else {
       $this->layoutView->redirectToRegisterPage();
     }
   }
 
-  private function registerUser() {
+  private function getUser() : \model\User {
     $username = $this->registerView->getUsername();
     $password = $this->registerView->getPassword();
+    return new \model\User($username, $password);
+  }
 
-    if ($this->userSQL->addUserToDatabase($username, $password)) {
+  private function registerUser(\model\User $user) {
+    if ($this->userSQL->addUserToDatabase($user->getUsername(), $user->getPassword())) {
       $this->sessionPrinter->userRegistered();
     } else {
       $this->sessionPrinter->registerDatabaseError();
@@ -28,13 +36,10 @@ class RegisterController extends BaseController {
   }
 
   //  Really ugly solution, can't think of another way of checking all issues after first issue has been found.
-  private function checkIfCredentialsAreWrong() : bool {
-    $username = $this->registerView->getUsername();
-    $password = $this->registerView->getPassword();
+  private function checkIfCredentialsAreWrong(\model\User $user) : bool {
     $repeatPassword = $this->registerView->getRepeatPassword();
     $this->sessionPrinter->setRegisterEnteredUsername();
     $errorFound = false;
-    $user = new \model\User($username, $password);
 
     if ($user->usernameIsTooShort()) {
       $this->sessionPrinter->usernameTooShort($user);

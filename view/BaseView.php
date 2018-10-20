@@ -1,6 +1,9 @@
 <?php
 namespace view;
 
+/**
+ * Using this class to avoid some string dependencies and class associations.
+ */
 class BaseView {
   protected static $idQuery = "id";
   protected static $userCreatedThreadQuery = "user-created-thread";

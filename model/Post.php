@@ -1,6 +1,11 @@
 <?php
 namespace model;
 
+/**
+ * The model representing a post.
+ * Need the fields to be public, otherwise json_encode can't access them.
+ * It needs to access them when saving posts to the database.
+ */
 class Post {
   public $post;
   public $author;

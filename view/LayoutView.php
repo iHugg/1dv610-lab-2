@@ -1,6 +1,11 @@
 <?php
 namespace view;
 
+/**
+ * Acts a bit like a master view.
+ * It decides what action is to be taken and then passes that action
+ * along to expert classes.
+ */
 class LayoutView extends BaseView {
   private $loginView;
   private $dateTimeView;
@@ -21,6 +26,9 @@ class LayoutView extends BaseView {
     $this->threadQuery = "thread";
   }
   
+  /**
+   * Renders the entire html page.
+   */
   public function render(bool $isLoggedIn, bool $tamperingFound) {
     $mainBody = $this->getContent($isLoggedIn);
     if ($tamperingFound) {
@@ -35,7 +43,7 @@ class LayoutView extends BaseView {
           <title>Login Example</title>
         </head>
         <body>
-          <h1>Assignment 2</h1>
+          <h1>Assignment 3</h1>
           ' . $this->renderRegisterLink() . '<br>
           ' . $this->renderThreadLink() . '
           ' . $this->renderIsLoggedIn($isLoggedIn) . '
@@ -58,6 +66,10 @@ class LayoutView extends BaseView {
     }
   }
 
+  /**
+   * Not a very pretty solution, yet it works.
+   * Returns html code based on what action the user made.
+   */
   private function getContent(bool $isLoggedIn) : string {
     if (isset($_GET[$this->registerQuery])) {
       return $this->registerView->generateRegisterFormHTML();
@@ -76,6 +88,9 @@ class LayoutView extends BaseView {
     return $this->loginView->response($isLoggedIn);
   }
 
+  /**
+   * The a tag message needs to vary depending on which page you're at.
+   */
   private function renderRegisterLink() {
     $location = $this->getLocation();
     $query = "";
@@ -95,6 +110,9 @@ class LayoutView extends BaseView {
     return '<a href="' . $location . '/index.php?' . $this->threadQuery . '" id="thread"> Go to threads</a>';
   }
 
+  /**
+   * The host varies depending on if using test server or production server.
+   */
   private function getLocation() {
     if ($_SERVER["HTTP_HOST"] == "localhost") {
       return "/1dv610-lab-2";

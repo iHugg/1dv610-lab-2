@@ -1,6 +1,9 @@
 <?php
 namespace view;
 
+/**
+ * Using this class to try and avoid printing to session from the controller.
+ */
 class SessionPrinter {
   private $session;
   private $loginView;
@@ -76,6 +79,10 @@ class SessionPrinter {
     $this->session->setMessage("");
   }
 
+  public function setLoggedInUsername(\model\User $user) {
+    $this->session->setUsername($user->getUsername());
+  }
+
   public function setLoginEnteredUsername() {
     $enteredUsername = $this->loginView->getEnteredUsername();
     $this->session->setEnteredUsername($enteredUsername);
@@ -83,8 +90,10 @@ class SessionPrinter {
 
   public function setRegisterEnteredUsername() {
     $enteredUsername = $this->registerView->getUsername();
-    $username = removeTagsAndInvalidCharacters($enteredUsername);
-    $this->session->setEnteredUsername($username);
+    if (strlen($enteredUsername) > 0) {
+      $enteredUsername = $this->removeTagsAndInvalidCharacters($enteredUsername);
+    }
+    $this->session->setEnteredUsername($enteredUsername);
   }
 
   public function titleIsTooShort($thread) {
@@ -96,7 +105,7 @@ class SessionPrinter {
   }
 
   public function titleContainsInvalidChar() {
-    $this->session->setMessage("Thread contains invalid character.");
+    $this->session->setMessage("Title contains invalid character.");
   }
 
   public function setThreadTitle(\model\Thread $thread) {
@@ -123,6 +132,14 @@ class SessionPrinter {
     $this->session->setPost("");
   }
 
+  public function emptyUsername() {
+    $this->session->setUsername("");
+  }
+
+  /**
+   * Probably just enough to remove tags.
+   * Thought it might as well remove some non-commonly used characters as well.
+   */
   public function removeTagsAndInvalidCharacters(string $data) : string {
     $data = strip_tags($data);
     return preg_replace('/[^A-Za-z0-9\-?!#$ ]/', '', $data);

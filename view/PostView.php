@@ -1,6 +1,9 @@
 <?php
 namespace view;
 
+/**
+ * Handles the html for the post related pages.
+ */
 class PostView extends BaseView {
   private static $post = "PostView::Post";
   private static $createPost = "PostView::CreatePost";
@@ -12,6 +15,10 @@ class PostView extends BaseView {
     parent::__construct($connection);
   }
 
+  /**
+   * Generates the html code for the page where you create a post.
+   * You're not allowed to create a post if you're not logged in.
+   */
   public function generatePostHTML(int $id) : string {
     $thread = null;
     try {
@@ -35,6 +42,9 @@ class PostView extends BaseView {
     ';
   }
 
+  /**
+   * Returns the html code containing all the posts for the specific thread.
+   */
   public function getPosts(\model\Thread $thread) : string {
     $postHtml = "";
 
@@ -57,6 +67,10 @@ class PostView extends BaseView {
     return $postHtml;
   }
 
+  /**
+   * You're only allowed to delete a post if you're logged in and you created that post or you're
+   * the creator of the thread or you're the admin.
+   */
   private function getDeletePostButtonHTML(\model\Post $post, \model\Thread $thread) : string {
     $submit = '
     <input type="hidden" id="' . self::$postIdName . '" name="' . self::$postIdName . '" value="' . $post->getId() . '"/>

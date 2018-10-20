@@ -1,6 +1,10 @@
 <?php
 namespace controller;
 
+/**
+ * Using this to help minimize the amount of associations
+ * the expert controllers have.
+ */
 class BaseController {
   protected $loginView;
   protected $registerView;

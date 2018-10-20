@@ -1,6 +1,9 @@
 <?php
 namespace controller;
 
+/**
+ * Kicks in when a user wants to logout.
+ */
 class LogoutController extends BaseController {
 
   public function __construct(\mysqli $connection) {
@@ -9,7 +12,7 @@ class LogoutController extends BaseController {
 
   public function handleLogout() {
     $this->session->logout();
-    $this->session->setUsername("");
+    $this->sessionPrinter->emptyUsername();
     $this->sessionPrinter->logout();
     $this->loginView->removeLoginCookies();
     $this->layoutView->redirectToLoginPage();

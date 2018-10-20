@@ -1,6 +1,9 @@
 <?php
 namespace model;
 
+/**
+ * The model representing a thread.
+ */
 class Thread {
   private $title;
   private $posts;
@@ -40,6 +43,10 @@ class Thread {
     return $this->postCount;
   }
 
+  /**
+   * The posts are in a json string when received from the database.
+   * Slight string dependency here as well.
+   */
   public function addPostsFromDatabase(string $json) {
     $posts = json_decode($json, true);
 
@@ -68,6 +75,9 @@ class Thread {
     return $this->posts;
   }
 
+  /**
+   * Changes the array of posts to a json string.
+   */
   public function getJsonPosts() : string {
     return json_encode($this->posts);
   }

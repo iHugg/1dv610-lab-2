@@ -1,6 +1,9 @@
 <?php
 namespace view;
 
+/**
+ * Handles the session information.
+ */
 class Session {
   private static $message = "flash";
   private static $loggedIn = "loggedIn";

@@ -1,6 +1,9 @@
 <?php
   namespace controller;
 
+  /**
+   * Controller which handles everything related to logging in.
+   */
   class LoginController extends BaseController {
 
     public function __construct(\mysqli $connection) {
@@ -8,13 +11,20 @@
     }
 
     public function handleLoginByCookies() {
-      $cookieUser = $this->loginView->getCookieUser();
-      $hashedPassword = $this->userSQL->getHashedPassword($cookieUser->getUsername());
-      if (password_verify($hashedPassword, $cookieUser->getPassword())) {
+      $user = $this->getUser();
+      $hashedPassword = $this->userSQL->getHashedPassword($user->getUsername());
+
+      if (password_verify($hashedPassword, $user->getPassword())) {
         $this->sessionPrinter->loggedInWithCookies();
         $this->session->login();
-        $this->session->setUsername($cookieUser->getUsername());
+        $this->session->setUsername($user->getUsername());
       }
+    }
+
+    private function getUser() : \model\User {
+      $username = $this->loginView->getCookieName();
+      $password = $this->loginView->getCookiePassword();
+      return new \model\User($username, $password);
     }
 
     public function handleLogin() {
@@ -42,15 +52,19 @@
     private function checkLoginCredentials(\model\User $user) {
       $hashedPassword = $this->userSQL->getHashedPassword($user->getUsername());
 
-      if ($user->HashedPasswordMatch($hashedPassword)) {
-        $this->sessionPrinter->loggedIn();
-        $this->session->setUsername($user->getUsername());
-        $this->session->login();
-        $this->handleStayLoggedIn($user);
+      if ($user->hashedPasswordMatch($hashedPassword)) {
+        $this->loginUser($user);
       } else {
         $this->sessionPrinter->wrongCredentials();
         $this->sessionPrinter->setLoginEnteredUsername();
       }
+    }
+
+    private function loginUser(\model\User $user) {
+      $this->sessionPrinter->loggedIn();
+      $this->sessionPrinter->setLoggedInUsername($user);
+      $this->session->login();
+      $this->handleStayLoggedIn($user);
     }
 
     private function getUserCredentials() : \model\User {
