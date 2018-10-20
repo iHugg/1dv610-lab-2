@@ -16,7 +16,7 @@ class BaseController {
   public function __construct(\mysqli $connection) {
     $this->loginView = new \view\LoginView();
     $this->registerView = new \view\RegisterView();
-    $this->layoutView = new \view\LayoutView($this->loginView, $this->registerView, $connection);
+    $this->layoutView = new \view\LayoutView($connection);
     $this->threadView = new \view\ThreadView($connection);
     $this->postView = new \view\PostView($connection);
     $this->sessionPrinter = new \view\SessionPrinter();

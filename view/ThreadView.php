@@ -1,29 +1,19 @@
 <?php
 namespace view;
 
-class ThreadView {
+class ThreadView extends BaseView {
   private static $messageId = "ThreadView::Message";
   private static $threadTitle = "ThreadView::Title";
-  private static $createThread = "TitleView::CreateThread";
-  private static $createThreadValue = "Create Thread";
-  private static $createdThreadQuery = "user-created-thread";
-  private static $createPostQuery = "create-post";
-  private static $deletePost = "ThreadView::DeletePost";
+  private static $createThread = "ThreadView::CreateThread";
   private static $deleteThread = "ThreadView::DeleteThread";
   private static $threadIdName = "ThreadView::ThreadId";
-  private static $postIdName = "ThreadView::PostId";
-  private $threadSQL;
-  private $session;
-  private $createThreadQuery;
+  private static $createThreadValue = "Create Thread";
+
+  private $postView;
 
   public function __construct(\mysqli $connection) {
-    $this->threadSQL = new \model\ThreadSQL($connection);
-    $this->session = new Session();
-    $this->createThreadQuery = "createThread";
-  }
-
-  public function getCreateThreadQuery() : string {
-    return $this->createThreadQuery;
+    parent::__construct($connection);
+    $this->postView = new PostView($connection);
   }
 
   public function generateThreadHTML() : string {
@@ -33,32 +23,17 @@ class ThreadView {
     ';
   }
 
-  public function generateCreateThreadLink() : string {
+  private function generateCreateThreadLink() : string {
     $location = $this->getLocation();
-    $html = '<a href="' . $location . '/index.php?' . $this->createThreadQuery . '=1">Create new thread</a><br>';
+    $html = '<a href="' . $location . '/index.php?' . self::$createThreadQuery . '=1">Create new thread</a><br>';
 
     if (!$this->session->isLoggedIn()) {
-      $html = "";
+      $html = "<p>You need to be logged in to create threads.</p>";
     }
 
     $html .= $this->generateThreadTitlesHTML();
 
     return $html;
-  }
-
-  public function generateCreateThreadHTML() : string {
-    return '
-    <h2>Create new thread</h2>
-    <form method="post">
-      <fieldset>
-        <legend>Create new thread - Enter thread title</legend>
-        <p id="' . self::$messageId . '">' . $this->session->getMessage() . '</p>
-        <label for="' . self::$threadTitle . '">Title: </label>
-        <input type="text" id="' . self::$threadTitle . '" name="' . self::$threadTitle . '" value="' . $this->session->getThreadTitle() . '" size="100"/><br>
-        <input type="submit" name="' . self::$createThread . '" value="' . self::$createThreadValue . '" />
-      </fieldset>
-    </form>
-    ';
   }
 
   private function generateThreadTitlesHTML() {
@@ -75,7 +50,8 @@ class ThreadView {
         $html .= '
         <fieldset>
           <legend>Created by: ' . $thread->getAuthor() . ' - Number of posts: ' . $thread->getPostCount() . '</legend>
-          <a href="' . $this->getLocation() . '/index.php?' . self::$createdThreadQuery . '=1&id=' . $thread->getId() . '" style="margin:10px;">' . $thread->getTitle() . '</a>
+          <a href="' . $this->getLocation() . '/index.php?' . self::$userCreatedThreadQuery . '=1&' . self::$idQuery . '=' . $thread->getId() .
+          '" style="margin:10px;">' . $thread->getTitle() . '</a>
           ' . $this->generateDeleteThreadHTML($thread) . '
         </fieldset>
         ';
@@ -99,51 +75,42 @@ class ThreadView {
     return $submit;
   }
 
-  public function generateUserCreatedThreadHTML(int $id) : string {
-    $title = $this->threadSQL->getTitle($id);
-    $createPostHtml = '<a href="' . $this->getLocation() . '/index.php?' . self::$createPostQuery . '=1&id=' . $id . '">Create post</a>';
-
-    if (!$this->session->isLoggedIn()) {
-      $createPostHtml = "";
-    }
+  public function generateCreateThreadHTML() : string {
     return '
-    <h2>' . $title . '</h2>
-    ' . $createPostHtml . '
-    ' . $this->getPosts() . '
+    <h2>Create new thread</h2>
+    <form method="post">
+      <fieldset>
+        <legend>Create new thread - Enter thread title</legend>
+        <p id="' . self::$messageId . '">' . $this->session->getMessage() . '</p>
+        <label for="' . self::$threadTitle . '">Title: </label>
+        <input type="text" id="' . self::$threadTitle . '" name="' . self::$threadTitle . '" value="' . $this->session->getThreadTitle() . '" size="100"/><br>
+        <input type="submit" name="' . self::$createThread . '" value="' . self::$createThreadValue . '" />
+      </fieldset>
+    </form>
     ';
   }
 
-  private function getPosts() : string {
-    $thread = $this->threadSQL->getThread($this->getIdFromURL());
-    $postHtml = "";
-    $submitHtml = '<input type="submit" name="' . self::$deletePost . '" value="Delete post" style="float:right;">';
-    $submit = "";
-
-    if ($thread != null) {
-      foreach ($thread->getPosts() as $key => $post) {
-        if ((!$this->session->isLoggedIn() || $this->session->getUsername() != $post->getAuthor()) && $this->session->getUsername() != "Admin" &&
-        $this->session->getUsername() != $thread->getAuthor()) {
-          $submit = "";
-        } else {
-          $submit = '
-          <input type="hidden" id="' . self::$postIdName . '" name="' . self::$postIdName . '" value="' . $post->getId() . '"/>
-          ' . $submitHtml . '
-          ';
-        }
-
-        $postHtml .= '
-        <form method="post">
-          <fieldset>
-            <legend>' . $post->getAuthor() . '</legend>
-            <p>' . nl2br($post->getPost()) . '</p>
-            ' . $submit . '
-          </fieldset>
-        </form>
-        ';
-      }
+  public function generateUserCreatedThreadHTML(int $id) : string {
+    $title = $this->threadSQL->getTitle($id);
+    $createPostHtml = '<a href="' . $this->getLocation() . '/index.php?' . self::$createPostQuery . '=1&' . self::$idQuery . '=' . $id . '">Create post</a>';
+    $thread = null;
+    try {
+      $thread = $this->threadSQL->getThread($id);
+    } catch (\Exception $ex) {
+      return '
+      <h1>No such thread was found!</h1>
+      ';
     }
 
-    return $postHtml;
+    if (!$this->session->isLoggedIn()) {
+      $createPostHtml = "<p>You need to be logged in to create posts.</p>";
+    }
+
+    return '
+    <h2>' . $title . '</h2>
+    ' . $createPostHtml . '
+    ' . $this->postView->getPosts($thread) . '
+    ';
   }
 
   private function getLocation() {
@@ -162,16 +129,8 @@ class ThreadView {
     return isset($_POST[self::$deleteThread]);
   }
 
-  public function wantsToDeletePost() : bool {
-    return isset($_POST[self::$deletePost]);
-  }
-
   public function getThreadIdToDelete() : int {
     return $_POST[self::$threadIdName];
-  }
-
-  public function getPostId() : int {
-    return $_POST[self::$postIdName];
   }
 
   public function getTitle() : string {
@@ -179,21 +138,7 @@ class ThreadView {
   }
 
   public function getIdFromURL() : int {
-    parse_str($_SERVER["QUERY_STRING"], $result);
-    
-    if (isset($result["id"])) {
-      return $result["id"];
-    }
-
-    return -1;
-  }
-
-  public function getCreatedThreadQuery() : string {
-    return self::$createdThreadQuery;
-  }
-
-  public function getCreatePostQuery() : string {
-    return static::$createPostQuery;
+    return $_GET[self::$idQuery];
   }
 }
 ?>

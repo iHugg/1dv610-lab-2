@@ -25,11 +25,11 @@ class PostController extends BaseController {
   }
 
   public function deletePost() {
-    $postId = $this->threadView->getPostId();
+    $postId = $this->postView->getPostId();
     $threadId = $this->threadView->getIdFromURL();
     $thread = $this->threadSQL->getThread($threadId);
     $thread->deletePost($postId);
-    $this->threadSQL->savePosts($threadId, $thread->getJsonPosts());
+    $this->threadSQL->savePosts($thread);
     $this->layoutView->redirectToCreatedThreadPage($threadId);
   }
 

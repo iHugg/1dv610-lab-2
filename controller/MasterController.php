@@ -65,7 +65,7 @@ class MasterController extends BaseController {
       $this->threadController->createThread();
     } else if ($this->postView->wantsToPost()) {
       $this->postController->savePost();
-    } else if ($this->threadView->wantsToDeletePost()) {
+    } else if ($this->postView->wantsToDeletePost()) {
       $this->postController->deletePost();
     } else if ($this->threadView->wantsToDeleteThread()) {
       $this->threadController->deleteThread();
@@ -78,7 +78,7 @@ class MasterController extends BaseController {
     !$this->registerView->wantsToRegister() &&
     !$this->threadView->wantsToCreateThread() &&
     !$this->postView->wantsToPost() &&
-    !$this->threadView->wantsToDeletePost() &&
+    !$this->postView->wantsToDeletePost() &&
     !$this->threadView->wantsToDeleteThread()) {
       $this->sessionPrinter->emptyMessage();
     }

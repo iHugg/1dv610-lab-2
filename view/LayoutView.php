@@ -1,7 +1,7 @@
 <?php
 namespace view;
 
-class LayoutView {
+class LayoutView extends BaseView {
   private $loginView;
   private $dateTimeView;
   private $registerView;
@@ -10,13 +10,13 @@ class LayoutView {
   private $registerQuery;
   private $threadQuery;
 
-  public function __construct(LoginView $loginView, RegisterView $registerView, \mysqli $connection) {
-    $this->loginView = $loginView;
+  public function __construct(\mysqli $connection) {
+    parent::__construct($connection);
+    $this->loginView = new LoginView();
     $this->dateTimeView = new DateTimeView();
-    $this->registerView = $registerView;
+    $this->registerView = new RegisterView();
     $this->threadView = new ThreadView($connection);
     $this->postView = new PostView($connection);
-    $this->connection = $connection;
     $this->registerQuery = "register";
     $this->threadQuery = "thread";
   }
@@ -59,25 +59,21 @@ class LayoutView {
   }
 
   private function getContent(bool $isLoggedIn) : string {
-    $queryString = $this->getQueryString();
-    parse_str($queryString, $result);
-    if (isset($result[$this->registerQuery])) {
+    if (isset($_GET[$this->registerQuery])) {
       return $this->registerView->generateRegisterFormHTML();
-     } else if (isset($result[$this->threadQuery])) {
+    } else if (isset($_GET[$this->threadQuery])) {
       return $this->threadView->generateThreadHTML();
-     } else if (isset($result[$this->threadView->getCreateThreadQuery()]) && $isLoggedIn) {
+    } else if (isset($_GET[self::$createThreadQuery]) && $isLoggedIn) {
       return $this->threadView->generateCreateThreadHTML();
-     } else if (isset($result[$this->threadView->getCreatedThreadQuery()])) {
-      return $this->threadView->generateUserCreatedThreadHTML($result["id"]);
-     } else if (isset($result[$this->threadView->getCreatePostQuery()]) && $isLoggedIn) {
-      return $this->postView->generatePostHTML($result["id"]);
-     }
+    } else if (isset($_GET[self::$userCreatedThreadQuery]) &&
+      isset($_GET[self::$idQuery])) {
+      return $this->threadView->generateUserCreatedThreadHTML($_GET[self::$idQuery]);
+    } else if (isset($_GET[self::$createPostQuery]) &&
+      isset($_GET[self::$idQuery]) && $isLoggedIn) {
+      return $this->postView->generatePostHTML($_GET[self::$idQuery]);
+    }
 
     return $this->loginView->response($isLoggedIn);
-  }
-
-  private function getQueryString() {
-    return $_SERVER["QUERY_STRING"];
   }
 
   private function renderRegisterLink() {
@@ -120,7 +116,8 @@ class LayoutView {
   }
 
   public function redirectToCreatedThreadPage(int $id) {
-    header("Location: http://" . $_SERVER["HTTP_HOST"] . $_SERVER["PHP_SELF"] . "?" . $this->threadView->getCreatedThreadQuery() . "=1&id=" . $id);
+    header("Location: http://" . $_SERVER["HTTP_HOST"] . $_SERVER["PHP_SELF"] . "?" . self::$userCreatedThreadQuery .
+    "=1&" . self::$idQuery . "=" . $id);
   }
 
   public function redirectToSamePage() {

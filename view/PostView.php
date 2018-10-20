@@ -1,22 +1,29 @@
 <?php
 namespace view;
 
-class PostView {
+class PostView extends BaseView {
   private static $post = "PostView::Post";
   private static $createPost = "PostView::CreatePost";
   private static $messageId = "PostView::Message";
-  private $threadSQL;
-  private $session;
+  private static $deletePost = "PostView::DeletePost";
+  private static $postIdName = "PostView::PostId";
 
   public function __construct(\mysqli $connection) {
-    $this->threadSQL = new \model\ThreadSQL($connection);
-    $this->session = new Session();
+    parent::__construct($connection);
   }
 
   public function generatePostHTML(int $id) : string {
-    $title = $this->threadSQL->getTitle($id);
+    $thread = null;
+    try {
+      $thread = $this->threadSQL->getThread($id);
+    } catch (\Exception $ex) {
+      return '
+      <h1>No such thread was found</h1>
+      ';
+    }
+
     return '
-    <h2>' . $title . '</h2>
+    <h2>' . $thread->getTitle() . '</h2>
     <form method="post">
       <fieldset>
         <legend>Enter your post</legend>
@@ -28,22 +35,60 @@ class PostView {
     ';
   }
 
+  public function getPosts(\model\Thread $thread) : string {
+    $postHtml = "";
+
+    if ($thread != null) {
+      foreach ($thread->getPosts() as $key => $post) {
+        $submit = $this->getDeletePostButtonHTML($post, $thread);
+
+        $postHtml .= '
+        <form method="post">
+          <fieldset>
+            <legend>' . $post->getAuthor() . '</legend>
+            <p>' . nl2br($post->getPost()) . '</p>
+            ' . $submit . '
+          </fieldset>
+        </form>
+        ';
+      }
+    }
+
+    return $postHtml;
+  }
+
+  private function getDeletePostButtonHTML(\model\Post $post, \model\Thread $thread) : string {
+    $submit = '
+    <input type="hidden" id="' . self::$postIdName . '" name="' . self::$postIdName . '" value="' . $post->getId() . '"/>
+    <input type="submit" name="' . self::$deletePost . '" value="Delete post" style="float:right;">
+    ';
+
+    if ((!$this->session->isLoggedIn() || $this->session->getUsername() != $post->getAuthor()) && $this->session->getUsername() != "Admin" &&
+    $this->session->getUsername() != $thread->getAuthor()) {
+      $submit = "";
+    }
+
+    return $submit;
+  }
+
   public function wantsToPost() : bool {
     return isset($_POST[self::$createPost]);
   }
 
   public function getIdFromURL() : int {
-    parse_str($_SERVER["QUERY_STRING"], $result);
-    
-    if (isset($result["id"])) {
-      return $result["id"];
-    }
-
-    return -1;
+    return $_GET[self::$idQuery];
   }
 
   public function getPost() : string {
     return $_POST[self::$post];
+  }
+
+  public function getPostId() : int {
+    return $_POST[self::$postIdName];
+  }
+
+  public function wantsToDeletePost() : bool {
+    return isset($_POST[self::$deletePost]);
   }
 }
 ?>

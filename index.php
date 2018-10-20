@@ -1,6 +1,7 @@
 <?php
 session_start();
 //INCLUDE THE FILES NEEDED...
+require_once('view/BaseView.php');
 require_once('view/LoginView.php');
 require_once('view/DateTimeView.php');
 require_once('view/LayoutView.php');

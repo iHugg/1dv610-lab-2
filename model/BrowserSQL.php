@@ -2,6 +2,9 @@
 namespace model;
 
 class BrowserSQL {
+  private static $tableName = "browsers";
+  private static $browserName = "browserName";
+  private static $passwordCookie = "passwordCookie";
   private $connection;
 
   public function __construct(\mysqli $connection) {
@@ -9,15 +12,18 @@ class BrowserSQL {
   }
 
   public function saveBrowser(string $browser, string $hashedPassword) {
-    $sql = 'REPLACE INTO browsers (browserName, passwordCookie) VALUES ("' . $browser . '", "' . $hashedPassword . '")';
+    $sql = 'UPDATE ' . self::$tableName . ' SET ' . self::$passwordCookie . '="' . $hashedPassword . '" 
+    WHERE ' . self::$browserName . '="' . $browser . '"';
     $this->connection->query($sql);
   }
 
   public function getCookiePassword(string $browser) : string {
-    $result = $this->connection->query('SELECT passwordCookie from browsers WHERE browserName = "' . $browser . '"');
+    $result = $this->connection->query('SELECT ' . self::$passwordCookie . ' FROM ' . self::$tableName . ' WHERE 
+    ' . self::$browserName . '="' . $browser . '"');
 
     if ($result->num_rows == 1) {
-      return $result->fetch_assoc()["passwordCookie"];
+      $result = $result->fetch_assoc();
+      return $result[self::$passwordCookie];
     }
 
     return "";
